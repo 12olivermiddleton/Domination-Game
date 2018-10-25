@@ -37,7 +37,7 @@ class Menu():
         for i in range(3):
             buttonTextNo = buttonTextNo + 1
             self.buttonList.append(Button(x,y, self.gameDisplay))
-            
+
             if buttonTextNo == 1:
                 textsurface = myfont.render("Play Game", False, Colour.white)
                 self.gameDisplay.blit(textsurface, (textPosX,y))
@@ -49,10 +49,10 @@ class Menu():
             elif buttonTextNo == 3:
                 textsurface = myfont.render("Instructions", False, Colour.white)
                 self.gameDisplay.blit(textsurface, (textPosX,y))
-                
+
             y = y + 100
             pygame.display.update()
-       
+
     def getButtonList(self):
         return self.buttonList
 
@@ -66,7 +66,7 @@ class Instructions():
         gameDisplay = pygame.display.set_mode((self.instructionsDisplay_width, self.instructionsDisplay_height))
         pygame.display.set_caption('Instructions')
         gameDisplay.fill(Colour.white)
-        
+
         #This is a test to see if the game display window works
         #pygame.draw.rect(gameDisplay, colour.red, (100,100,100,100))
 
@@ -78,7 +78,7 @@ class Button():
         self.width = 330
         self.height = 75
 
-        
+
         pygame.draw.rect(gameDisplay, self.initialColour, (self.x,self.y,self.width,self.height))
 
         pygame.display.update()
@@ -88,7 +88,7 @@ class Board():
         self.display_width = 491
         self.display_height = 941
         self.DisplayMap()
-        
+
     def DisplayMap(self):
 
         gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
@@ -104,18 +104,18 @@ class Board():
         gameDisplay.blit(mapImg, (0, 0))
 
 
-        
+
 
 
 if __name__ == "__main__":
-    
+
     pygame.init()
     colour = Colour()
     menu = Menu()
     #board = Board()
     clock = pygame.time.Clock()
 
-    
+
     mouse = pygame.mouse.get_pos()
     print(mouse)
 
@@ -140,47 +140,45 @@ if __name__ == "__main__":
                 ButtonNumber = 0
                 ### sort out the button numbers, use iterative statements to define the button number// which botton was pressed
                 while ButtonFound == False:
-                
+
                     ButtonNumber = ButtonNumber + 1
                     if buttonMaxX > mouse[0] > buttonMinX and buttonMaxY > mouse[1] > buttonMinY:
-                        
+
                         pygame.draw.rect(menu.gameDisplay,colour.red, (buttonMinX, buttonMinY, 330,75))
 
                         pygame.display.update()
-                        
+
                         ButtonFound = True
-                        
+
 ##                        print(ButtonNumber)
 ##                        print("hello")
-                        
+
                         if ButtonNumber == 1:
                             pygame.quit()
                             board = Board()
                             pygame.display.update()
-                            
+
                         elif ButtonNumber == 2:
                             ### need to add in a load game function
                             pass
-                        
+
                         elif ButtonNumber == 3:
                             pygame.quit()
                             instructions = Instructions()
                             pygame.display.update()
-                        
+
                     else:
                         buttonMinY = buttonMinY + 100
                         buttonMaxY = buttonMaxY + 100
-                    
+
 
 
 #pygame.draw.rect(menu.gameDisplay,colour.red, (self.x,self.y,self.width,self.height))
 
-                    
-                
+
+
 
 
     pygame.display.update()
     clock.tick(60)
-
-
-    
+print ("hello")
