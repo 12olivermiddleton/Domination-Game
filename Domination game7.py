@@ -113,6 +113,12 @@ class Board():
         self.IYPos = 735
         self.JXPos = 192
         self.JYPos = 853
+        # Shields
+        self.shield1 = pygame.image.load('Shield1.fw.PNG')
+        self.shield2 = pygame.image.load('Shield 2.fw.PNG')
+        self.shield3 = pygame.image.load('Shield 3.fw.PNG')
+        self.shield4 = pygame.image.load('Shield 4.fw.PNG')
+        self.shield5 = pygame.image.load('Shield 5.fw.PNG')
 
         # setting up the display
         self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
@@ -122,8 +128,6 @@ class Board():
 
         self.DisplayMap()
         pygame.display.update()
-
-
 
     def DisplayMap(self):
 
@@ -137,7 +141,6 @@ class Board():
         self.gameDisplay.blit(mapImg, (0, 0))
 
         pygame.display.update()
-
 
         # Drawing the icons onto the map
         pygame.draw.rect(self.gameDisplay, self.iconColour, (self.AXPos, self.AYPos, self.iconHeight, self.iconWidth)) # Node A on network graph
@@ -154,7 +157,6 @@ class Board():
         self.PlayGame()
         pygame.display.update()
 
-
     def PlayGame(self):
         crashed = False
         while not crashed:
@@ -167,38 +169,50 @@ class Board():
                 mouse = pygame.mouse.get_pos()
                 print(mouse)
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.display.update()
                     iconFound = False
 
                     while iconFound == False:
                         if self.AXPos + self.iconWidth > mouse[0] > self.AXPos and self.AYPos + self.iconHeight > mouse[1] > self.AYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.AXPos, self.AYPos, self.iconHeight, self.iconWidth))
+
+                            self.gameDisplay.blit(self.shield1, (self.AXPos, self.AYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.AXPos, self.AYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.BXPos + self.iconWidth > mouse[0] > self.BXPos and self.BYPos + self.iconHeight > mouse[1] > self.BYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.BXPos, self.BYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield2, (self.BXPos, self.BYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.BXPos, self.BYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.CXPos + self.iconWidth > mouse[0] > self.CXPos and self.CYPos + self.iconHeight > mouse[1] > self.CYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.CXPos, self.CYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield4, (self.CXPos, self.CYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.CXPos, self.CYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.DXPos + self.iconWidth > mouse[0] > self.DXPos and self.DYPos + self.iconHeight > mouse[1] > self.DYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.DXPos, self.DYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield3, (self.DXPos, self.DYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.DXPos, self.DYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.EXPos + self.iconWidth > mouse[0] > self.EXPos and self.EYPos + self.iconHeight > mouse[1] > self.EYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.EXPos, self.EYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield2, (self.EXPos, self.EYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.EXPos, self.EYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.FXPos + self.iconWidth > mouse[0] > self.FXPos and self.FYPos + self.iconHeight > mouse[1] > self.FYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.FXPos, self.FYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield5, (self.FXPos, self.FYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.FXPos, self.FYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.GXPos + self.iconWidth > mouse[0] > self.GXPos and self.GYPos + self.iconHeight > mouse[1] > self.GYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.GXPos, self.GYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield4, (self.GXPos, self.GYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.GXPos, self.GYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.HXPos + self.iconWidth > mouse[0] > self.HXPos and self.HYPos + self.iconHeight > mouse[1] > self.HYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.HXPos, self.HYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield3, (self.HXPos, self.HYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.HXPos, self.HYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.IXPos + self.iconWidth > mouse[0] > self.IXPos and self.IYPos + self.iconHeight > mouse[1] > self.IYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.IXPos, self.IYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield1, (self.IXPos, self.IYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.IXPos, self.IYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
                         elif self.JXPos + self.iconWidth > mouse[0] > self.JXPos and self.JYPos + self.iconHeight > mouse[1] > self.JYPos:
-                            pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.JXPos, self.JYPos, self.iconHeight, self.iconWidth))
+                            self.gameDisplay.blit(self.shield5, (self.JXPos, self.JYPos))
+                            #pygame.draw.rect(self.gameDisplay, Colour.aqua, (self.JXPos, self.JYPos, self.iconHeight, self.iconWidth))
                             iconFound = True
 
                         pygame.display.update()
@@ -207,33 +221,40 @@ class Board():
 
 class Icons():
     def __init__(self):
-        self.iconAConnections = [B]
-        self.iconBConnections = [A, C, D, E]
-        self.iconCConnections = [B, F]
-        self.iconDConnections = [B, E, F, G]
-        self.iconEConnections = [B, D, G]
-        self.iconFConnections = [C, D, H]
-        self.iconGConnections = [D, E, H, I]
-        self.iconHConnections = [F, G, I]
-        self.iconIConnections = [G, H, J]
-        self.iconJConnections = [H, I]
-
-        self.ConnectorDict = {icona: self.iconAConnections}
-        print (self.ConnectorDict[icona])
+        # Defines and dsets up the network graph for the map
+         self.networkGraph = {
+             "A": ["B"],
+             "B": ["A","C","D","E"],
+             "C": ["B","F"],
+             "D": ["B","E","F","G"],
+             "E": ["B","D","G"],
+             "F": ["C","D","H"],
+             "G": ["D","E","H","I"],
+             "H": ["F","G","I"],
+             "I": ["G","H","J"],
+             "J": ["H","I"]}
+         print (self.networkGraph["B"])
+##A = [B]
+##B = [A, C, D, E]
+##C = [B, F]
+##D = [B, E, F, G]
+##E = [B, D, G]
+##F = [C, D, H]
+##G = [D, E, H, I]
+##H = [F, G, I]
+##I = [G, H, J]
+##J = [H, I]
 
 if __name__ == "__main__":
 
-
     pygame.init()
     colour = Colour()
-    icons = Icons()
     menu = Menu()
+    icons = Icons()
     # changes in order to test objectifying the rectangle A
-
 
     #board = Board()
     clock = pygame.time.Clock()
-
 
     mouse = pygame.mouse.get_pos()
     print(mouse)
@@ -268,30 +289,11 @@ if __name__ == "__main__":
                         pygame.display.update()
 
                         buttonFound = True
-#####################################################################################################################################
-                    #
-                    # Menu optiuon is loaded below
+
+                    # Menu option is loaded below
                         if buttonNumber == 1:
                             pygame.quit()
                             board = Board()
-                    #
-                    #         mouse = pygame.mouse.get_pos()
-                    #         print(mouse)
-                    #
-                    #         if event.type == pygame.MOUSEBUTTONDOWN:
-                    #             iconFound = False
-                    #
-                    #             while iconFound == False:
-                    #                 if AXPos + self.iconWidth > mouse[0] > self.AXPos and self.AYPos + self.iconHeight > mouse[1] > self.AYPos:
-                    #
-                    #                     pygame.draw.rect(gameDisplay, Colour.aqua, (self.AXPos, self.AYPos, self.iconHeight, self.iconWidth))
-                    #
-                    #
-                    #
-                    #                     pygame.display.update()
-
-#####################################################################################################################################
-
 
                         elif buttonNumber == 2:
                             ### need to add in a load game function
@@ -301,19 +303,11 @@ if __name__ == "__main__":
                             pygame.quit()
                             instructions = Instructions()
                             pygame.display.update()
-
                     else:
                         buttonMinY = buttonMinY + 100
                         buttonMaxY = buttonMaxY + 100
 
-
-
 #pygame.draw.rect(menu.gameDisplay,colour.red, (self.x,self.y,self.width,self.height))
-
-
-
-
 
     pygame.display.update()
     clock.tick(60)
-print ("hello")
