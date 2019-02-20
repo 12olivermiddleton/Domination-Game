@@ -11,8 +11,8 @@ class Colour():
     red = pygame.Color(255, 0, 0)
     green = pygame.Color(0, 255, 0)
     blue = pygame.Color(0, 153, 255)
-    medBlue = pygame.Color(0, 92, 150)
-    darkBlue = pygame.Color(0, 51, 102)
+    medium_blue = pygame.Color(0, 92, 150)
+    dark_blue = pygame.Color(0, 51, 102)
     white = pygame.Color(255, 255, 255)
     aqua = pygame.Color(0, 255, 255)
     black = pygame.Color(0, 0, 0)
@@ -20,47 +20,60 @@ class Colour():
     darkGrey = pygame.Color(23, 26, 37)
 
 
+class CustomFont():
+    def __init__(self):
+        pygame.font.init()
+        domination_font = "./MyDominationFont.ttf"
+        self.splash_title = pygame.font.Font(domination_font, 50)
+        self.splash_button = pygame.font.Font(domination_font, 30)
+        self.menu_heading = pygame.font.Font(domination_font, 30)
+        self.menu_title = pygame.font.Font(domination_font, 20)
+        self.menu_action = pygame.font.Font(domination_font, 15)
+        self.menu_button = pygame.font.Font(domination_font, 30)
+
+
 class Menu():
     def __init__(self):
 
-        self.buttonList = []
+        self.button_list = []
         self.display_width = 600
         self.display_height = 600
+        domination_font = CustomFont()
 
-        self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
+        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Menu')
-        self.gameDisplay.fill(Colour.darkGrey)
+        self.game_display.fill(Colour.darkGrey)
 
-        myfont = pygame.font.SysFont("Comic Sans MS", 60)
-        textsurface = myfont.render("Domination", False, Colour.white)
-        self.gameDisplay.blit(textsurface, (110, 50))
+        text_surface = domination_font.splash_title.render("Domination", False, Colour.white)
+        self.game_display.blit(text_surface, (110, 50))
 
         x = 120
         y = 220
-        textPosX = 130
-        buttonTextNo = 0
-        myfont = pygame.font.SysFont("Comic Sans MS", 40)
+        text_pos_x = 130
+        button_text_no = 0
+
         for i in range(3):
-            buttonTextNo = buttonTextNo + 1
-            self.buttonList.append(Button(x, y, self.gameDisplay))
+            button_text_no = button_text_no + 1
+            text_pos_y = y + 20
+            self.button_list.append(Button(x, y, self.game_display))
 
-            if buttonTextNo == 1:
-                textsurface = myfont.render("Play Game", False, Colour.white)
-                self.gameDisplay.blit(textsurface, (textPosX, y))
+            if button_text_no == 1:
+                text_surface = domination_font.splash_button.render("Play Game", False, Colour.white)
+                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
-            elif buttonTextNo == 2:
-                textsurface = myfont.render("Load Game", False, Colour.white)
-                self.gameDisplay.blit(textsurface, (textPosX, y))
+            elif button_text_no == 2:
+                text_surface = domination_font.splash_button.render("Load Game", False, Colour.white)
+                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
-            elif buttonTextNo == 3:
-                textsurface = myfont.render("Instructions", False, Colour.white)
-                self.gameDisplay.blit(textsurface, (textPosX, y))
+            elif button_text_no == 3:
+                text_surface = domination_font.splash_button.render("Instructions", False, Colour.white)
+                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
             y = y + 100
             pygame.display.update()
 
     def getButtonList(self):
-        return self.buttonList
+        return self.button_list
 
 
 class Instructions():
@@ -70,12 +83,12 @@ class Instructions():
         self.instructionsPanel()
 
     def instructionsPanel(self):
-        gameDisplay = pygame.display.set_mode((self.instructionsDisplay_width, self.instructionsDisplay_height))
+        game_display = pygame.display.set_mode((self.instructionsDisplay_width, self.instructionsDisplay_height))
         pygame.display.set_caption('Instructions')
-        gameDisplay.fill(Colour.pink)
+        game_display.fill(Colour.pink)
 
         # This is a test to see if the game display window works
-        # pygame.draw.rect(gameDisplay, colour.red, (100,100,100,100))
+        # pygame.draw.rect(game_display, colour.red, (100,100,100,100))
 
 
 class Graphic():
@@ -85,22 +98,22 @@ class Graphic():
 
 
 class Button(Graphic):
-    def __init__(self, x, y, gameDisplay):
+    def __init__(self, x, y, game_display):
         super().__init__(x, y)
-        self.initialColour = Colour.darkBlue
+        self.initial_colour = Colour.dark_blue
         self.width = 330
         self.height = 75
 
-        pygame.draw.rect(gameDisplay, self.initialColour, (self.x, self.y, self.width, self.height))
+        pygame.draw.rect(game_display, self.initial_colour, (self.x, self.y, self.width, self.height))
         pygame.display.update()
 
 
 class Icons():
     def __init__(self):
-        self.usernode = 'B'
-        self.priornode = 'G'
+        self.user_node = 'B'
+        self.prior_node = 'G'
         # Defines and sets up the network graph for the map
-        self.networkGraph = {
+        self.network_graph = {
             "A": ["B"],
             "B": ["A", "C", "D", "E"],
             "C": ["B", "F"],
@@ -111,9 +124,9 @@ class Icons():
             "H": ["F", "G", "I"],
             "I": ["G", "H", "J"],
             "J": ["H", "I"]}
-        print (*self.networkGraph["B"])
-        if self.usernode in self.networkGraph[self.priornode]:
-            print ("I am a genius!!!")
+        print(*self.network_graph["B"])
+        if self.user_node in self.network_graph[self.prior_node]:
+            print("I am a genius!!!")
         else:
             print("that was a massive fail")
 
@@ -136,31 +149,25 @@ class Board():
         # Display  size
         self.display_width = 748
         self.display_height = 941
-        self.mapx = 300
-        self.mapy = 0
+        self.board_position_x = 300
+        self.board_position_y = 0
         # Icon information
-        self.iconColour = Colour.medBlue
-        self.iconList = []
+        self.icon_colour = Colour.medium_blue
+        self.icon_list = []
 
-        # side menu butttons
-        self.sideMenuButtonList = []
-        self.sideMenuLineList = []
-        self.sideMenuLineColour = Colour.white
-        self.menuLineWidth = 3
-
-        # side menu
-        self.stageWidth = 99
-        self.stageHeight = 75
-        self.stagey = 876
-        self.stageXRect1 = 0
-        self.stageXRect2 = 101
-        self.stageXRect3 = 202
-        self.statusColour = Colour.white
-        self.currentColour = Colour.red
-        self._stageColour = Colour.black
+        # stage menu
+        self.stage_width = 99
+        self.stage_height = 75
+        self.sidemenu_stage_position_y = 876
+        self.sidemenu_stage_allocate_pos_x = 0
+        self.sidemenu_stage_attack_pos_x = 101
+        self.sidemenu_stage_fortify_pos_x = 202
+        self.status_colour = Colour.white
+        self.current_colour = Colour.red
+        self._stage_colour = Colour.black
 
         # setting up the display
-        self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
+        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
         self.clock = pygame.time.Clock()
         ######
@@ -171,16 +178,16 @@ class Board():
 
     def setUpIcons(self):
         # X and Y coordinates of each icon
-        self.iconList.append(Icon(self.iconColour, 575, 25, "A", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 525, 225, "B", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 371, 473, "C", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 505, 518, "D", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 628, 459, "E", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 414, 593, "F", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 613, 593, "G", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 468, 704, "H", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 620, 735, "I", 'Shield1.fw.PNG'))
-        self.iconList.append(Icon(self.iconColour, 492, 853, "J", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 575, 25, "A", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 525, 225, "B", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 371, 473, "C", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 505, 518, "D", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 628, 459, "E", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 414, 593, "F", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 613, 593, "G", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 468, 704, "H", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 620, 735, "I", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 492, 853, "J", 'Shield1.fw.PNG'))
 
     ##    def setUpSideMenu(self):
     ##        self.sideMenuLineList.append(((0,0), (300, 0)))
@@ -191,67 +198,61 @@ class Board():
         pass
 
     def DisplayMap(self):
+        domination_font = CustomFont()
         # loading the map
-        mapImg = pygame.image.load('GOT map 2.JPG')
+        map_img = pygame.image.load('GOT map 2.JPG')
 
         x = (self.display_width * 0.45)
         y = (self.display_height * 0.8)
 
-        self.gameDisplay.fill(Colour.darkGrey)
-        self.gameDisplay.blit(mapImg, (self.mapx, self.mapy))
+        self.game_display.fill(Colour.darkGrey)
+        self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
 
         # drawing lines for side menu
-        pygame.draw.line(self.gameDisplay, Colour.white, (0, 0), (300, 0), 3)
-        pygame.draw.line(self.gameDisplay, Colour.white, (0, 941), (300, 941), 3)
-        pygame.draw.line(self.gameDisplay, Colour.white, (0, 0), (0, 941), 3)
-        pygame.draw.line(self.gameDisplay, Colour.white, (300, 0), (300, 941), 3)
+        pygame.draw.line(self.game_display, Colour.white, (0, 0), (300, 0), 3)
+        pygame.draw.line(self.game_display, Colour.white, (0, 941), (300, 941), 3)
+        pygame.draw.line(self.game_display, Colour.white, (0, 0), (0, 941), 3)
+        pygame.draw.line(self.game_display, Colour.white, (300, 0), (300, 941), 3)
 
-        pygame.draw.rect(self.gameDisplay, Colour.medBlue, (20, 150, 260, 75))
-        pygame.draw.rect(self.gameDisplay, Colour.medBlue, (20, 250, 260, 75))
-        pygame.draw.rect(self.gameDisplay, Colour.medBlue, (20, 350, 260, 75))
+        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 150, 260, 75))
+        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 250, 260, 75))
+        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 350, 260, 75))
 
-        pygame.draw.rect(self.gameDisplay, self.statusColour,
-                         (self.stageXRect1, self.stagey, self.stageWidth, self.stageHeight))
-        pygame.draw.rect(self.gameDisplay, self.statusColour,
-                         (self.stageXRect2, self.stagey, self.stageWidth, self.stageHeight))
-        pygame.draw.rect(self.gameDisplay, self.statusColour,
-                         (self.stageXRect3, self.stagey, self.stageWidth, self.stageHeight))
+        pygame.draw.rect(self.game_display, self.status_colour,
+                         (self.sidemenu_stage_allocate_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
+        pygame.draw.rect(self.game_display, self.status_colour,
+                         (self.sidemenu_stage_attack_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
+        pygame.draw.rect(self.game_display, self.status_colour,
+                         (self.sidemenu_stage_fortify_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
 
-        pygame.font.init()
-
-        myfont = pygame.font.SysFont("Comic Sans MS", 50)
-        myfont2 = pygame.font.SysFont("Comic Sans MS", 30)
-        myfont3 = pygame.font.SysFont("Comic Sans MS", 20)
-        myfont4 = pygame.font.SysFont("Comic Sans MS", 40)
-
-        headerText1 = myfont.render("Domination", False, Colour.white)
-        headerText2 = myfont4.render("Menu", False, Colour.white)
-        stageText = myfont2.render("Stage", False, Colour.white)
-        allocationText = myfont3.render("Allocation", False, self._stageColour)
-        attackText = myfont3.render("Attack", False, self._stageColour)
-        fortifyText = myfont3.render("Fortify", False, self._stageColour)
-        helpText = myfont4.render("Help", False, self.statusColour)
-        savegameText = myfont4.render("Save Game", False, self.statusColour)
-        savequitText = myfont4.render("Save & Quit", False, self.statusColour)
-        quitText = myfont4.render("Quit", False, self.statusColour)
+        header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
+        header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
+        stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
+        allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
+        attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
+        fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
+        help_text = domination_font.menu_button.render("Help", False, self.status_colour)
+        savegame_text = domination_font.menu_button.render("Save Game", False, self.status_colour)
+        savequit_text = domination_font.menu_button.render("Save & Quit", False, self.status_colour)
+        quit_text = domination_font.menu_button.render("Quit", False, self.status_colour)
 
         # research how to undeline font in pygame
         # pygame.font.Font.set_underline()
-        self.gameDisplay.blit(headerText1, (20, 5))
-        self.gameDisplay.blit(headerText2, (100, 75))
-        self.gameDisplay.blit(stageText, (110, 825))
-        self.gameDisplay.blit(allocationText, (5, 890))
-        self.gameDisplay.blit(attackText, (120, 890))
-        self.gameDisplay.blit(fortifyText, (220, 890))
-        self.gameDisplay.blit(savegameText, (45, 155))
-        self.gameDisplay.blit(helpText, (100, 255))
-        self.gameDisplay.blit(quitText, (100, 355))
+        self.game_display.blit(header_text1, (20, 5))
+        self.game_display.blit(header_text2, (100, 75))
+        self.game_display.blit(stage_text, (110, 825))
+        self.game_display.blit(allocation_text, (5, 890))
+        self.game_display.blit(attack_text, (120, 890))
+        self.game_display.blit(fortify_text, (220, 890))
+        self.game_display.blit(savegame_text, (45, 155))
+        self.game_display.blit(help_text, (100, 255))
+        self.game_display.blit(quit_text, (100, 355))
 
         pygame.display.update()
 
         # Drawing the icons onto the map
-        for icon in self.iconList:
-            pygame.draw.rect(self.gameDisplay, icon.colour, (icon.x, icon.y, icon.height, icon.width))
+        for icon in self.icon_list:
+            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.height, icon.width))
             pygame.display.update()
         ##
         ##        # drawing side menu
@@ -265,27 +266,28 @@ class Board():
 class PlayGame():
     def __init__(self, board):
         # side menu assistance variables
-        self.stageWidth = 99
-        self.stageHeight = 75
-        self.stagey = 876
-        self.stageXRect1 = 0
-        self.stageXRect2 = 101
-        self.stageXRect3 = 202
-        self._statusColour = Colour.white
-        self.currentColour = Colour.red
+        self.stage_width = 99
+        self.stage_height = 75
+        self.sidemenu_stage_position_y = 876
+        self.sidemenu_stage_allocate_pos_x = 40
+        self.sidemenu_stage_attack_pos_x = 101
+        self.sidemenu_stage_fortify_pos_x = 202
+        self.status_colour = Colour.white
+        self.current_colour = Colour.red
+
         # Variables used to store player turns
-        self.player1Turns = 0
-        self.player2Turns = 0
+        self.player1_turns = 0
+        self.player2_turns = 0
 
         # Varioables used for the change between players
-        self.currentPlayer = "p1"
-        self.currentShield = ""
-        self.currentPlayerData = {}
-        self.currentPlayerNoOfTerritories = 0
+        self.current_player = "p1"
+        self.current_shield = ""
+        self.current_player_data = {}
+        self.current_player_no_of_territories = 0
         # sets up dictionary for main game loop
         # self.curretnNode = 'A'
-        self.player1Shield = 'Shield 5.fw.PNG'
-        self.player2Shield = 'Shield 2.fw.PNG'
+        self.player1_shield = 'Shield 5.fw.PNG'
+        self.player2_shield = 'Shield 2.fw.PNG'
 
         self.player1 = {
             "playerOccupied": [],
@@ -299,7 +301,7 @@ class PlayGame():
             "H": [],
             "I": [],
             "J": []}
-        self.player1NoOfTerritories = 0
+        self.player1_no_of_territories = 0
         self.player2 = {
             "playerOccupied": [],
             "A": [],  # Part of dict storing No, of troops
@@ -312,7 +314,7 @@ class PlayGame():
             "H": [],
             "I": [],
             "J": []}
-        self.player2NoOfTerritories = 0
+        self.player2_no_of_territories = 0
         # print (self.player1["p1Occupied"])
 
         ##        if self.curretnNode in self.player1["p1Occupied"]:
@@ -327,21 +329,21 @@ class PlayGame():
 
     def playGame(self):
 
-        if self.currentPlayer == "p1":
-            self.currentPlayerData = self.player1
-            self.currentPlayerNoOfTerritories = self.player1NoOfTerritories
-            self.currentShield = self.player1Shield
-            print(self.currentPlayerData)
-            print(self.currentPlayerNoOfTerritories)
-            self.currentPlayer = "p2"
+        if self.current_player == "p1":
+            self.current_player_data = self.player1
+            self.current_player_no_of_territories = self.player1_no_of_territories
+            self.current_shield = self.player1_shield
+            print(self.current_player_data)
+            print(self.current_player_no_of_territories)
+            self.current_player = "p2"
 
         else:
-            self.currentPlayerData = self.player2
-            self.currentPlayerNoOfTerritories = self.player2NoOfTerritories
-            self.currentShield = self.player2Shield
-            print(self.currentPlayerData)
-            print(self.currentPlayerNoOfTerritories)
-            self.currentPlayer = "p1"
+            self.current_player_data = self.player2
+            self.current_player_no_of_territories = self.player2_no_of_territories
+            self.current_shield = self.player2_shield
+            print(self.current_player_data)
+            print(self.current_player_no_of_territories)
+            self.current_player = "p1"
 
         while not self.crashed:
             for event in pygame.event.get():
@@ -356,16 +358,16 @@ class PlayGame():
                     # for button in
                     # print ("mouse", mouse)
                     # pygame.display.update()
-                    for icon in board.iconList:
+                    for icon in board.icon_list:
                         print(icon.x, icon.y)
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
                             print(icon.node, "node")
-                            self.board.gameDisplay.blit(pygame.image.load(self.currentShield), (icon.x, icon.y))
-                            if icon.node in self.currentPlayerData["playerOccupied"]:
+                            self.board.gameDisplay.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
+                            if icon.node in self.current_player_data["playerOccupied"]:
                                 pass
                             else:
-                                self.currentPlayerData["playerOccupied"].extend(icon.node)
-                                print (self.currentPlayerData)
+                                self.current_player_data["playerOccupied"].extend(icon.node)
+                                print(self.current_player_data)
 
                             iconFound = False
                             pygame.display.update()
@@ -382,13 +384,13 @@ class PlayGame():
         pygame.display.update()
 
     def allocationStage(self):
-        print ("this is the allocation of your troops")
-        pygame.draw.rect(board.gameDisplay, self.currentColour,
-                         (self.stageXRect1, self.stagey, self.stageWidth, self.stageHeight))
+        print("this is the allocation of your troops")
+        pygame.draw.rect(board.game_display, self.currentColour,
+                         (self.stageXRect1, self.stage_y, self.stage_width, self.stage_height))
 
         pygame.display.update()
-        pygame.draw.rect(board.gameDisplay, self.statusColour,
-                         (self.stageXRect1, self.stagey, self.stageWidth, self.stageHeight))
+        pygame.draw.rect(board.game_display, self.statusColour,
+                         (self.stageXRect1, self.stage_y, self.stage_width, self.stage_height))
 
         pygame.display.update()
 
@@ -460,36 +462,36 @@ if __name__ == "__main__":
                 quit()
                 crashed = True
             if event.type == pygame.MOUSEBUTTONDOWN:
-                buttonMinX = 120
-                buttonMaxX = 450
-                buttonMinY = 220
-                buttonMaxY = 295
+                button_min_x = 120
+                button_max_x = 450
+                button_min_y = 220
+                button_max_y = 295
                 mouse = pygame.mouse.get_pos()
                 print(mouse)
-                buttonFound = False
-                buttonNumber = 0
+                button_found = False
+                button_number = 0
                 # sort out the button numbers, use iterative statements to define the button number// which botton was pressed
-                while buttonFound == False:
-                    buttonNumber = buttonNumber + 1
-                    if buttonMaxX > mouse[0] > buttonMinX and buttonMaxY > mouse[1] > buttonMinY:
-                        pygame.draw.rect(menu.gameDisplay, colour.red, (buttonMinX, buttonMinY, 330, 75))
+                while button_found == False:
+                    button_number = button_number + 1
+                    if button_max_x > mouse[0] > button_min_x and button_max_y > mouse[1] > button_min_y:
+                        pygame.draw.rect(menu.game_display, colour.red, (button_min_x, button_min_y, 330, 75))
                         pygame.display.update()
-                        buttonFound = True
+                        button_found = True
                         # Menu option is loaded below
-                        if buttonNumber == 1:
+                        if button_number == 1:
                             pygame.quit()
                             board = Board()
                             play = PlayGame(board)
-                        elif buttonNumber == 2:
+                        elif button_number == 2:
                             ### need to add in a load game function
                             pass
-                        elif buttonNumber == 3:
+                        elif button_number == 3:
                             pygame.quit()
                             instructions = Instructions()
                             pygame.display.update()
                     else:
-                        buttonMinY = buttonMinY + 100
-                        buttonMaxY = buttonMaxY + 100
+                        button_min_y = button_min_y + 100
+                        button_max_y = button_max_y + 100
     # pygame.draw.rect(menu.gameDisplay,colour.red, (self.x,self.y,self.width,self.height))
 
     pygame.display.update()
