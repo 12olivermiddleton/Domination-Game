@@ -147,7 +147,7 @@ class Icon(Graphic):
 class Board():
     def __init__(self):
         # Display  size
-        self.display_width = 748
+        self.display_width = 1048
         self.display_height = 941
         self.board_position_x = 300
         self.board_position_y = 0
@@ -274,18 +274,28 @@ class PlayGame():
         self.sidemenu_stage_fortify_pos_x = 202
         self.status_colour = Colour.white
         self.current_colour = Colour.red
-
+        self.network_graph = {
+            "A": ["B"],
+            "B": ["A", "C", "D", "E"],
+            "C": ["B", "F"],
+            "D": ["B", "E", "F", "G"],
+            "E": ["B", "D", "G"],
+            "F": ["C", "D", "H"],
+            "G": ["D", "E", "H", "I"],
+            "H": ["F", "G", "I"],
+            "I": ["G", "H", "J"],
+            "J": ["H", "I"]}
         # Variables used to store player turns
         self.player1_turns = 0
         self.player2_turns = 0
 
         # Varioables used for the change between players
-        self.current_player = "p1"
+        self.current_player = "p2"
         self.current_shield = ""
         self.current_player_data = {}
         self.current_player_no_of_territories = 0
         # sets up dictionary for main game loop
-        # self.curretnNode = 'A'
+        # self.currentNode = 'A'
         self.player1_shield = 'Shield 5.fw.PNG'
         self.player2_shield = 'Shield 2.fw.PNG'
 
@@ -303,7 +313,8 @@ class PlayGame():
             "J": []}
         self.player1_no_of_territories = 0
         self.player2 = {
-            "playerOccupied": [],
+            ###TODO remove this hardcoding
+            "playerOccupied": ["A","D", "G", "I"],
             "A": [],  # Part of dict storing No, of troops
             "B": [],
             "C": [],
@@ -344,36 +355,36 @@ class PlayGame():
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p1"
+        # while not self.crashed:
+        #     for event in pygame.event.get():
+        #         # print(event)
+        #         if event.type == pygame.QUIT:
+        #             pygame.quit()
+        #             quit()
+        #             self.crashed = True
+        #         mouse = pygame.mouse.get_pos()
+        #         if event.type == pygame.MOUSEBUTTONDOWN:
+        #             # for
+        #             # for button in
+        #             # print ("mouse", mouse)
+        #             # pygame.display.update()
+        #             for icon in board.icon_list:
+        #                 print(icon.x, icon.y)
+        #                 if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
+        #                     print(icon.node, "node")
+        #                     self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
+        #                     if icon.node in self.current_player_data["playerOccupied"]:
+        #                         pass
+        #                     else:
+        #                         self.current_player_data["playerOccupied"].extend(icon.node)
+        #                         print(self.current_player_data)
+        #
+        #                     iconFound = False
+        #                     pygame.display.update()
+        #                     break
+        #         else:
+        #             pass
 
-        while not self.crashed:
-            for event in pygame.event.get():
-                # print(event)
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                    self.crashed = True
-                mouse = pygame.mouse.get_pos()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    # for
-                    # for button in
-                    # print ("mouse", mouse)
-                    # pygame.display.update()
-                    for icon in board.icon_list:
-                        print(icon.x, icon.y)
-                        if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-                            print(icon.node, "node")
-                            self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
-                            if icon.node in self.current_player_data["playerOccupied"]:
-                                pass
-                            else:
-                                self.current_player_data["playerOccupied"].extend(icon.node)
-                                print(self.current_player_data)
-
-                            iconFound = False
-                            pygame.display.update()
-                            break
-                else:
-                    pass
 
     def SaveGame(self):
         pass
@@ -383,14 +394,20 @@ class PlayGame():
 
         pygame.display.update()
 
-    def allocationStage(self):
-        print("this is the allocation of your troops")
-        pygame.draw.rect(board.game_display, self.currentColour,
-                         (self.stageXRect1, self.stage_y, self.stage_width, self.stage_height))
 
-        pygame.display.update()
-        pygame.draw.rect(board.game_display, self.statusColour,
-                         (self.stageXRect1, self.stage_y, self.stage_width, self.stage_height))
+    def allocationStage(self):
+        count = 0
+        print ("this is the allocation of your troops")
+        #implementing breadth first search for nodes around the users current nodes for troop allocation
+        # Traversing the network graph to find neighbouring nodes
+        for CurrentNode in self.current_player_data["playerOccupied"]:
+            #print("this is the node in the allocation stage", node)
+            CurrentVertexList = self.network_graph[CurrentNode]
+            #print (CurrentVertexList)
+            for vertex in CurrentVertexList:
+                count = count + 1
+        print ("the number of troopps that the player will receive is", count)
+        NoOfTroops = count
 
         pygame.display.update()
 
