@@ -362,7 +362,7 @@ class PlayGame():
                         print(icon.x, icon.y)
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
                             print(icon.node, "node")
-                            self.board.gameDisplay.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
+                            self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
                             if icon.node in self.current_player_data["playerOccupied"]:
                                 pass
                             else:
