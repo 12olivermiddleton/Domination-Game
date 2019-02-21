@@ -144,37 +144,140 @@ class Icon(Graphic):
         self.shield = shield
 
 
-class Board():
-    def __init__(self):
-        # Display  size
-        self.display_width = 1048
-        self.display_height = 941
-        self.board_position_x = 300
-        self.board_position_y = 0
-        # Icon information
-        self.icon_colour = Colour.medium_blue
-        self.icon_list = []
+class SideMenuLeft():
+    # relative sizing for buttons and menus
 
-        # stage menu
-        self.stage_width = 99
+    def __init__(self):
+
+        # Menu Container
+        self.menu_width = 330
+        self.x_pos_menu_container = 0
+        self.y_pos_menu_container = 0
+
+        # Stage (split into 3 buttons with 1 pixel divider)
+        self.y_pos_stage_menu = 876
+        self.stage_button_width = round(self.menu_width / 3) - 1
         self.stage_height = 75
-        self.sidemenu_stage_position_y = 876
-        self.sidemenu_stage_allocate_pos_x = 0
-        self.sidemenu_stage_attack_pos_x = 101
-        self.sidemenu_stage_fortify_pos_x = 202
+        self.x_pos_stage_allocate = 0
+        self.x_pos_stage_attack = round(self.menu_width/3)
+        self.x_pos_stage_fortify = round(self.menu_width/3)*2
+
         self.status_colour = Colour.white
         self.current_colour = Colour.red
         self._stage_colour = Colour.black
 
+        self.menu_container_height = self.y_pos_stage_menu + self.stage_height
+
+        # Menu buttons
+        self.x_pos_menu_buttons_container_indent = 20
+        self.y_pos_menu_buttons_container_top = 150
+        self.menu_button_height = 75
+        self.menu_button_vertical_gap = 25
+        self.menu_button_width = self.menu_width - 2 * self.x_pos_menu_buttons_container_indent # pad either side
+        self.menu_button_vertical_spacing = self.menu_button_height + self.menu_button_vertical_gap
+
+        self.btn_save = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, self.menu_button_width, self.menu_button_height)
+        self.btn_info = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, self.menu_button_width, self.menu_button_height)
+        self.btn_quit = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, self.menu_button_width, self.menu_button_height)
+
+
+    def drawItems(self, surface):  # example of method overloading
+        # border lines for side menu
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3) # across bottom
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3) # down left side
+        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
+
+        # side menu left buttons
+        pygame.draw.rect(surface, Colour.medium_blue, self.btn_save)
+        pygame.draw.rect(surface, Colour.medium_blue, self.btn_info)
+        pygame.draw.rect(surface, Colour.medium_blue, self.btn_quit)
+
+        # side menu left stages buttons
+        pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
+        pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
+        pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
+
+        def centreJustifyIndent(indent, button_width, text_object):
+            return indent + round((button_width - text_object.get_width()) /2)
+
+        domination_font = CustomFont()
+        header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
+        header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
+        surface.blit(header_text1, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text1), 5))
+        surface.blit(header_text2, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text2), 75))
+
+        save_text = domination_font.menu_button.render("Save Game", False, self.status_colour)
+        help_text = domination_font.menu_button.render("Info", False, self.status_colour)
+        quit_text = domination_font.menu_button.render("Quit", False, self.status_colour)
+        surface.blit(save_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, save_text), 155))
+        surface.blit(help_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, help_text), 255))
+        surface.blit(quit_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, quit_text), 355))
+
+        stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
+        surface.blit(stage_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent, self.menu_button_width, stage_text), 825))
+
+        allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
+        attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
+        fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
+        surface.blit(allocation_text, (centreJustifyIndent(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
+        surface.blit(attack_text, (centreJustifyIndent(self.x_pos_stage_attack, self.stage_button_width, attack_text), 890))
+        surface.blit(fortify_text, (centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
+
+
+class SideMenuRight():
+    def __init__(self):
+
+        # Sections
+        self.status_colour = Colour.white
+        self.current_colour = Colour.red
+
+        # Menu Container
+        self.menu_width = 300
+        self.menu_height = 0
+
+
+class Board():
+    def __init__(self):
+
+        # Side menu left
+        self.side_menu_left = SideMenuLeft()
+
+
+        # Board
+        self.board_width = 484 # width of map jpg
+        self.board_height = 941 # width of map jpg
+        self.board_position_x = 0 + self.side_menu_left.menu_width
+        self.board_position_y = 0
+
+        # Side menu right
+        self.side_menu_right = SideMenuRight()
+        self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
+        self.side_menu_right_position_y = 0
+
+        # Display  size
+        self.display_width = self.side_menu_left.menu_width + self.board_width + self.side_menu_right.menu_width
+        self.display_height = max(self.side_menu_left.menu_container_height, self.board_height, self.side_menu_right.menu_height)
+
+        # Icon information
+        self.icon_colour = Colour.medium_blue
+        self.icon_list = []
+
         # setting up the display
         self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
+        self.game_display.fill(Colour.darkGrey)
         self.clock = pygame.time.Clock()
         ######
+        self.side_menu_left.drawItems(self.game_display)
         self.setUpIcons()
-        ##self.setUpSideMenu()
         self.DisplayMap()
+
+
         pygame.display.update()
+
+    def setUpMenuButtons(self):
+        pass
 
     def setUpIcons(self):
         # X and Y coordinates of each icon
@@ -189,64 +292,14 @@ class Board():
         self.icon_list.append(Icon(self.icon_colour, 620, 735, "I", 'Shield1.fw.PNG'))
         self.icon_list.append(Icon(self.icon_colour, 492, 853, "J", 'Shield1.fw.PNG'))
 
-    ##    def setUpSideMenu(self):
-    ##        self.sideMenuLineList.append(((0,0), (300, 0)))
-    ##        self.sideMenuLineList.append(((5,5), (300, 120)))
-    ##        print (self.sideMenuLineList)
 
     def setUpMenuButtons(self):
         pass
 
     def DisplayMap(self):
-        domination_font = CustomFont()
         # loading the map
         map_img = pygame.image.load('GOT map 2.JPG')
-
-        x = (self.display_width * 0.45)
-        y = (self.display_height * 0.8)
-
-        self.game_display.fill(Colour.darkGrey)
         self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
-
-        # drawing lines for side menu
-        pygame.draw.line(self.game_display, Colour.white, (0, 0), (300, 0), 3)
-        pygame.draw.line(self.game_display, Colour.white, (0, 941), (300, 941), 3)
-        pygame.draw.line(self.game_display, Colour.white, (0, 0), (0, 941), 3)
-        pygame.draw.line(self.game_display, Colour.white, (300, 0), (300, 941), 3)
-
-        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 150, 260, 75))
-        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 250, 260, 75))
-        pygame.draw.rect(self.game_display, Colour.medium_blue, (20, 350, 260, 75))
-
-        pygame.draw.rect(self.game_display, self.status_colour,
-                         (self.sidemenu_stage_allocate_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
-        pygame.draw.rect(self.game_display, self.status_colour,
-                         (self.sidemenu_stage_attack_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
-        pygame.draw.rect(self.game_display, self.status_colour,
-                         (self.sidemenu_stage_fortify_pos_x, self.sidemenu_stage_position_y, self.stage_width, self.stage_height))
-
-        header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
-        header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
-        stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
-        allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
-        attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
-        fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
-        help_text = domination_font.menu_button.render("Help", False, self.status_colour)
-        savegame_text = domination_font.menu_button.render("Save Game", False, self.status_colour)
-        savequit_text = domination_font.menu_button.render("Save & Quit", False, self.status_colour)
-        quit_text = domination_font.menu_button.render("Quit", False, self.status_colour)
-
-        # research how to undeline font in pygame
-        # pygame.font.Font.set_underline()
-        self.game_display.blit(header_text1, (20, 5))
-        self.game_display.blit(header_text2, (100, 75))
-        self.game_display.blit(stage_text, (110, 825))
-        self.game_display.blit(allocation_text, (5, 890))
-        self.game_display.blit(attack_text, (120, 890))
-        self.game_display.blit(fortify_text, (220, 890))
-        self.game_display.blit(savegame_text, (45, 155))
-        self.game_display.blit(help_text, (100, 255))
-        self.game_display.blit(quit_text, (100, 355))
 
         pygame.display.update()
 
@@ -254,11 +307,6 @@ class Board():
         for icon in self.icon_list:
             pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.height, icon.width))
             pygame.display.update()
-        ##
-        ##        # drawing side menu
-        ##        for element in self.sideMenuLineList:
-        ##            pygame.draw.line(self.gameDisplay, self.sideMenuLineColour, ((startXCoord, startYCoord), (endXCoord, endYCoord)),  self.menuLineWidth)
-        ##            pygame.display.update()
 
         return self
 
@@ -266,14 +314,6 @@ class Board():
 class PlayGame():
     def __init__(self, board):
         # side menu assistance variables
-        self.stage_width = 99
-        self.stage_height = 75
-        self.sidemenu_stage_position_y = 876
-        self.sidemenu_stage_allocate_pos_x = 40
-        self.sidemenu_stage_attack_pos_x = 101
-        self.sidemenu_stage_fortify_pos_x = 202
-        self.status_colour = Colour.white
-        self.current_colour = Colour.red
         self.network_graph = {
             "A": ["B"],
             "B": ["A", "C", "D", "E"],
@@ -429,7 +469,7 @@ class PlayGame():
                     quit()
                     self.crashed = True
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    print("I'm a genius!!")
+                    print("I'm a genius 222222!!")
         pass
 
 
