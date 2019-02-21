@@ -1,9 +1,9 @@
 # Programming Project - Domination
 # By Oliver Middleton
 
-# things to do
-# flow of game display
 import pygame
+import sys
+from pygame.math import Vector2
 import time
 
 
@@ -338,6 +338,8 @@ class PlayGame():
         # self.currentNode = 'A'
         self.player1_shield = 'Shield 5.fw.PNG'
         self.player2_shield = 'Shield 2.fw.PNG'
+        self.player1_initial_troops = 4
+        self.player2_initial_troops = 4
 
         self.player1 = {
             "playerOccupied": [],
@@ -375,7 +377,8 @@ class PlayGame():
         # self.sideMenuAssistance()
 
         self.playGame()
-        self.allocationStage()
+        self.calculateTroops()
+        self.allocateTroops(board)
         self.play()
 
     def playGame(self):
@@ -395,49 +398,17 @@ class PlayGame():
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p1"
-        # while not self.crashed:
-        #     for event in pygame.event.get():
-        #         # print(event)
-        #         if event.type == pygame.QUIT:
-        #             pygame.quit()
-        #             quit()
-        #             self.crashed = True
-        #         mouse = pygame.mouse.get_pos()
-        #         if event.type == pygame.MOUSEBUTTONDOWN:
-        #             # for
-        #             # for button in
-        #             # print ("mouse", mouse)
-        #             # pygame.display.update()
-        #             for icon in board.icon_list:
-        #                 print(icon.x, icon.y)
-        #                 if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-        #                     print(icon.node, "node")
-        #                     self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
-        #                     if icon.node in self.current_player_data["playerOccupied"]:
-        #                         pass
-        #                     else:
-        #                         self.current_player_data["playerOccupied"].extend(icon.node)
-        #                         print(self.current_player_data)
-        #
-        #                     iconFound = False
-        #                     pygame.display.update()
-        #                     break
-        #         else:
-        #             pass
-
 
     def SaveGame(self):
         pass
-
     def LoadGame(self):
         pass
-
         pygame.display.update()
 
 
-    def allocationStage(self):
+    def calculateTroops(self):
         count = 0
-        print ("this is the allocation of your troops")
+        print ("This is the allocation of your troops")
         #implementing breadth first search for nodes around the users current nodes for troop allocation
         # Traversing the network graph to find neighbouring nodes
         for CurrentNode in self.current_player_data["playerOccupied"]:
@@ -446,10 +417,53 @@ class PlayGame():
             #print (CurrentVertexList)
             for vertex in CurrentVertexList:
                 count = count + 1
-        print ("the number of troopps that the player will receive is", count)
+        print("The number of troops that the player will receive is:", count)
         NoOfTroops = count
 
         pygame.display.update()
+    def allocateTroops(self, board):
+
+        selected_rect = None  # Currently selected rectangle.
+        rectangles = []
+
+
+        for y in range(5):
+            rectangles.append(pygame.Rect(20, 30 * y, 25, 25))
+        # As a list comprehension.
+        # rectangles = [pg.Rect(20, 30*y, 17, 17) for y in range(5)]
+
+        clock = pygame.time.Clock()
+        running = True
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        for rectangle in rectangles:
+                            if rectangle.collidepoint(event.pos):
+                                offset = Vector2(rectangle.topleft) - event.pos
+                                selected_rect = rectangle
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    if event.button == 1:
+                        selected_rect = None
+                elif event.type == pygame.MOUSEMOTION:
+                    if selected_rect:
+                        selected_rect.topleft = event.pos + offset
+
+
+            for rectangle in rectangles:
+                pygame.draw.rect(board.game_display, Colour.red, rectangle)
+                pygame.display.update()
+                pass
+
+            pygame.display.flip()
+            clock.tick()
+        pygame.quit()
+        sys.exit()
+        pygame.display.update()
+
 
     def makeMove(self):
         pass
