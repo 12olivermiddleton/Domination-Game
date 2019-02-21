@@ -434,23 +434,27 @@ class PlayGame():
 
         clock = pygame.time.Clock()
         running = True
-
+        button_down = False
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
+                    button_down = True
                     if event.button == 1:
                         for rectangle in rectangles:
                             if rectangle.collidepoint(event.pos):
                                 offset = Vector2(rectangle.topleft) - event.pos
                                 selected_rect = rectangle
                 elif event.type == pygame.MOUSEBUTTONUP:
+                    button_down = False
                     if event.button == 1:
                         selected_rect = None
                 elif event.type == pygame.MOUSEMOTION:
-                    if selected_rect:
-                        selected_rect.topleft = event.pos + offset
+                    if button_down:
+                        board.DisplayMap()
+                        if selected_rect:
+                            selected_rect.topleft = event.pos + offset
 
 
             for rectangle in rectangles:
