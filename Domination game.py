@@ -225,6 +225,14 @@ class SideMenuLeft():
         surface.blit(fortify_text, (centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
 
 
+
+class Board():
+    def __init__(self):
+        # Board size
+        self.width = 484  # width of map jpg
+        self.height = 941  # width of map jpg
+
+
 class SideMenuRight():
     def __init__(self):
 
@@ -236,28 +244,46 @@ class SideMenuRight():
         self.menu_width = 300
         self.menu_height = 0
 
-
-class Board():
+class GameSurfaces():
     def __init__(self):
 
         # Side menu left
         self.side_menu_left = SideMenuLeft()
 
+        # create the board game surface
+        self.board = Board()
 
-        # Board
-        self.board_width = 484 # width of map jpg
-        self.board_height = 941 # width of map jpg
+        # Side menu right
+        self.side_menu_right = SideMenuRight()
+
+
+
+
+
+
+class Canvas():
+    def __init__(self):
+
+        # get the game surfaces for the board
+        self.game_surfaces = GameSurfaces()
+        self.side_menu_left = self.game_surfaces.side_menu_left
+        self.side_menu_right = self.game_surfaces.side_menu_right
+        self.board = self.game_surfaces.board
+
+
+
+
+       #board position on canvas
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
 
         # Side menu right
-        self.side_menu_right = SideMenuRight()
-        self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
+        self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board.width
         self.side_menu_right_position_y = 0
 
         # Display  size
-        self.display_width = self.side_menu_left.menu_width + self.board_width + self.side_menu_right.menu_width
-        self.display_height = max(self.side_menu_left.menu_container_height, self.board_height, self.side_menu_right.menu_height)
+        self.display_width = self.side_menu_left.menu_width + self.board.width + self.side_menu_right.menu_width
+        self.display_height = max(self.side_menu_left.menu_container_height, self.board.height, self.side_menu_right.menu_height)
 
         # Icon information
         self.icon_colour = Colour.medium_blue
@@ -555,7 +581,7 @@ if __name__ == "__main__":
                         # Menu option is loaded below
                         if button_number == 1:
                             pygame.quit()
-                            board = Board()
+                            board = Canvas()
                             play = PlayGame(board)
                         elif button_number == 2:
                             ### need to add in a load game function
