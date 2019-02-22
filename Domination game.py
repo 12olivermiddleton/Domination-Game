@@ -1,9 +1,9 @@
 # Programming Project - Domination
 # By Oliver Middleton
 
-# things to do
-# flow of game display
 import pygame
+import sys
+from pygame.math import Vector2
 import time
 
 
@@ -166,7 +166,7 @@ class SideMenuLeft():
         self.current_colour = Colour.red
         self._stage_colour = Colour.black
 
-        self.menu_container_height = self.y_pos_stage_menu + self.stage_height
+        self.menu_height = self.y_pos_stage_menu + self.stage_height
 
         # Menu buttons
         self.x_pos_menu_buttons_container_indent = 20
@@ -184,9 +184,9 @@ class SideMenuLeft():
     def drawItems(self, surface):  # example of method overloading
         # border lines for side menu
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3) # across bottom
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3) # down left side
-        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_height), (self.menu_width, self.menu_height), 3) # across bottom
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_height), 3) # down left side
+        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_height), 3) # down right side
 
         # side menu left buttons
         pygame.draw.rect(surface, Colour.medium_blue, self.btn_save)
@@ -225,6 +225,15 @@ class SideMenuLeft():
         surface.blit(fortify_text, (centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
 
 
+
+class Board():
+    def __init__(self):
+        # Board size
+        self.width = 484  # width of map jpg
+        self.height = 941  # width of map jpg
+        self.background_image = 'GOT map 2.jpg'
+
+
 class SideMenuRight():
     def __init__(self):
 
@@ -236,43 +245,59 @@ class SideMenuRight():
         self.menu_width = 300
         self.menu_height = 0
 
-
-class Board():
+class GameSurfaces():
     def __init__(self):
 
         # Side menu left
         self.side_menu_left = SideMenuLeft()
+        #self.side_menu_left.surface  = pygame.display.set_mode((self.side_menu_left.menu_width, self.side_menu_left.menu_height))
+
+        # create the board game surface
+        self.board = Board()
+        #self.board.surface = pygame.display.set_mode((self.board.width, self.board.height))
+
+        # Side menu right
+        self.side_menu_right = SideMenuRight()
+        #self.side_menu_right.surface = pygame.display.set_mode((self.side_menu_right.menu_width, self.side_menu_right.menu_height))
 
 
-        # Board
-        self.board_width = 484 # width of map jpg
-        self.board_height = 941 # width of map jpg
+class Canvas():
+    def __init__(self):
+
+        # get the game surfaces for the board
+        #self.game_surfaces = GameSurfaces()
+        self.side_menu_left = SideMenuLeft()
+        self.side_menu_right = SideMenuRight()
+        self.board = Board()
+
+
+
+
+       #board position on canvas
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
 
         # Side menu right
-        self.side_menu_right = SideMenuRight()
-        self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
+        self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board.width
         self.side_menu_right_position_y = 0
 
         # Display  size
-        self.display_width = self.side_menu_left.menu_width + self.board_width + self.side_menu_right.menu_width
-        self.display_height = max(self.side_menu_left.menu_container_height, self.board_height, self.side_menu_right.menu_height)
+        self.display_width = self.side_menu_left.menu_width + self.board.width + self.side_menu_right.menu_width
+        self.display_height = max(self.side_menu_left.menu_height, self.board.height, self.side_menu_right.menu_height)
 
         # Icon information
         self.icon_colour = Colour.medium_blue
         self.icon_list = []
 
         # setting up the display
-        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
+        self.canvas_layer = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
-        self.game_display.fill(Colour.darkGrey)
+        self.canvas_layer.fill(Colour.darkGrey)
         self.clock = pygame.time.Clock()
         ######
-        self.side_menu_left.drawItems(self.game_display)
+        self.side_menu_left.drawItems(self.canvas_layer)
         self.setUpIcons()
         self.DisplayMap()
-
 
         pygame.display.update()
 
@@ -298,14 +323,14 @@ class Board():
 
     def DisplayMap(self):
         # loading the map
-        map_img = pygame.image.load('GOT map 2.JPG')
-        self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
+        map_img = pygame.image.load(self.board.background_image)
+        self.canvas_layer.blit(map_img, (self.board_position_x, self.board_position_y))
 
         pygame.display.update()
 
         # Drawing the icons onto the map
         for icon in self.icon_list:
-            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.height, icon.width))
+            pygame.draw.rect(self.canvas_layer, icon.colour, (icon.x, icon.y, icon.height, icon.width))
             pygame.display.update()
 
         return self
@@ -338,6 +363,8 @@ class PlayGame():
         # self.currentNode = 'A'
         self.player1_shield = 'Shield 5.fw.PNG'
         self.player2_shield = 'Shield 2.fw.PNG'
+        self.player1_initial_troops = 4
+        self.player2_initial_troops = 4
 
         self.player1 = {
             "playerOccupied": [],
@@ -375,7 +402,8 @@ class PlayGame():
         # self.sideMenuAssistance()
 
         self.playGame()
-        self.allocationStage()
+        self.calculateTroops()
+        self.allocateTroops()
         self.play()
 
     def playGame(self):
@@ -395,49 +423,17 @@ class PlayGame():
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p1"
-        # while not self.crashed:
-        #     for event in pygame.event.get():
-        #         # print(event)
-        #         if event.type == pygame.QUIT:
-        #             pygame.quit()
-        #             quit()
-        #             self.crashed = True
-        #         mouse = pygame.mouse.get_pos()
-        #         if event.type == pygame.MOUSEBUTTONDOWN:
-        #             # for
-        #             # for button in
-        #             # print ("mouse", mouse)
-        #             # pygame.display.update()
-        #             for icon in board.icon_list:
-        #                 print(icon.x, icon.y)
-        #                 if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-        #                     print(icon.node, "node")
-        #                     self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
-        #                     if icon.node in self.current_player_data["playerOccupied"]:
-        #                         pass
-        #                     else:
-        #                         self.current_player_data["playerOccupied"].extend(icon.node)
-        #                         print(self.current_player_data)
-        #
-        #                     iconFound = False
-        #                     pygame.display.update()
-        #                     break
-        #         else:
-        #             pass
-
 
     def SaveGame(self):
         pass
-
     def LoadGame(self):
         pass
-
         pygame.display.update()
 
 
-    def allocationStage(self):
+    def calculateTroops(self):
         count = 0
-        print ("this is the allocation of your troops")
+        print ("This is the allocation of your troops")
         #implementing breadth first search for nodes around the users current nodes for troop allocation
         # Traversing the network graph to find neighbouring nodes
         for CurrentNode in self.current_player_data["playerOccupied"]:
@@ -446,10 +442,14 @@ class PlayGame():
             #print (CurrentVertexList)
             for vertex in CurrentVertexList:
                 count = count + 1
-        print ("the number of troopps that the player will receive is", count)
+        print("The number of troops that the player will receive is:", count)
         NoOfTroops = count
 
         pygame.display.update()
+    def allocateTroops(self):
+
+        pass
+
 
     def makeMove(self):
         pass
@@ -537,7 +537,7 @@ if __name__ == "__main__":
                         # Menu option is loaded below
                         if button_number == 1:
                             pygame.quit()
-                            board = Board()
+                            board = Canvas()
                             play = PlayGame(board)
                         elif button_number == 2:
                             ### need to add in a load game function
