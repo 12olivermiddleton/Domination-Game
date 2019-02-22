@@ -166,7 +166,7 @@ class SideMenuLeft():
         self.current_colour = Colour.red
         self._stage_colour = Colour.black
 
-        self.menu_container_height = self.y_pos_stage_menu + self.stage_height
+        self.menu_height = self.y_pos_stage_menu + self.stage_height
 
         # Menu buttons
         self.x_pos_menu_buttons_container_indent = 20
@@ -184,9 +184,9 @@ class SideMenuLeft():
     def drawItems(self, surface):  # example of method overloading
         # border lines for side menu
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3) # across bottom
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3) # down left side
-        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_height), (self.menu_width, self.menu_height), 3) # across bottom
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_height), 3) # down left side
+        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_height), 3) # down right side
 
         # side menu left buttons
         pygame.draw.rect(surface, Colour.medium_blue, self.btn_save)
@@ -231,6 +231,7 @@ class Board():
         # Board size
         self.width = 484  # width of map jpg
         self.height = 941  # width of map jpg
+        self.background_image = 'GOT map 2.jpg'
 
 
 class SideMenuRight():
@@ -249,26 +250,25 @@ class GameSurfaces():
 
         # Side menu left
         self.side_menu_left = SideMenuLeft()
+        #self.side_menu_left.surface  = pygame.display.set_mode((self.side_menu_left.menu_width, self.side_menu_left.menu_height))
 
         # create the board game surface
         self.board = Board()
+        #self.board.surface = pygame.display.set_mode((self.board.width, self.board.height))
 
         # Side menu right
         self.side_menu_right = SideMenuRight()
-
-
-
-
+        #self.side_menu_right.surface = pygame.display.set_mode((self.side_menu_right.menu_width, self.side_menu_right.menu_height))
 
 
 class Canvas():
     def __init__(self):
 
         # get the game surfaces for the board
-        self.game_surfaces = GameSurfaces()
-        self.side_menu_left = self.game_surfaces.side_menu_left
-        self.side_menu_right = self.game_surfaces.side_menu_right
-        self.board = self.game_surfaces.board
+        #self.game_surfaces = GameSurfaces()
+        self.side_menu_left = SideMenuLeft()
+        self.side_menu_right = SideMenuRight()
+        self.board = Board()
 
 
 
@@ -283,22 +283,21 @@ class Canvas():
 
         # Display  size
         self.display_width = self.side_menu_left.menu_width + self.board.width + self.side_menu_right.menu_width
-        self.display_height = max(self.side_menu_left.menu_container_height, self.board.height, self.side_menu_right.menu_height)
+        self.display_height = max(self.side_menu_left.menu_height, self.board.height, self.side_menu_right.menu_height)
 
         # Icon information
         self.icon_colour = Colour.medium_blue
         self.icon_list = []
 
         # setting up the display
-        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
+        self.canvas_layer = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
-        self.game_display.fill(Colour.darkGrey)
+        self.canvas_layer.fill(Colour.darkGrey)
         self.clock = pygame.time.Clock()
         ######
-        self.side_menu_left.drawItems(self.game_display)
+        self.side_menu_left.drawItems(self.canvas_layer)
         self.setUpIcons()
         self.DisplayMap()
-
 
         pygame.display.update()
 
@@ -324,14 +323,14 @@ class Canvas():
 
     def DisplayMap(self):
         # loading the map
-        map_img = pygame.image.load('GOT map 2.JPG')
-        self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
+        map_img = pygame.image.load(self.board.background_image)
+        self.canvas_layer.blit(map_img, (self.board_position_x, self.board_position_y))
 
         pygame.display.update()
 
         # Drawing the icons onto the map
         for icon in self.icon_list:
-            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.height, icon.width))
+            pygame.draw.rect(self.canvas_layer, icon.colour, (icon.x, icon.y, icon.height, icon.width))
             pygame.display.update()
 
         return self
@@ -404,7 +403,7 @@ class PlayGame():
 
         self.playGame()
         self.calculateTroops()
-        self.allocateTroops(board)
+        self.allocateTroops()
         self.play()
 
     def playGame(self):
@@ -447,52 +446,9 @@ class PlayGame():
         NoOfTroops = count
 
         pygame.display.update()
-    def allocateTroops(self, board):
+    def allocateTroops(self):
 
-        selected_rect = None  # Currently selected rectangle.
-        rectangles = []
-
-
-        for y in range(5):
-            rectangles.append(pygame.Rect(20, 30 * y, 25, 25))
-        # As a list comprehension.
-        # rectangles = [pg.Rect(20, 30*y, 17, 17) for y in range(5)]
-
-        clock = pygame.time.Clock()
-        running = True
-        button_down = False
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    button_down = True
-                    if event.button == 1:
-                        for rectangle in rectangles:
-                            if rectangle.collidepoint(event.pos):
-                                offset = Vector2(rectangle.topleft) - event.pos
-                                selected_rect = rectangle
-                elif event.type == pygame.MOUSEBUTTONUP:
-                    button_down = False
-                    if event.button == 1:
-                        selected_rect = None
-                elif event.type == pygame.MOUSEMOTION:
-                    if button_down:
-                        board.DisplayMap()
-                        if selected_rect:
-                            selected_rect.topleft = event.pos + offset
-
-
-            for rectangle in rectangles:
-                pygame.draw.rect(board.game_display, Colour.red, rectangle)
-                pygame.display.update()
-                pass
-
-            pygame.display.flip()
-            clock.tick()
-        pygame.quit()
-        sys.exit()
-        pygame.display.update()
+        pass
 
 
     def makeMove(self):
