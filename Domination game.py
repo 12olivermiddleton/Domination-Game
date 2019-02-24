@@ -381,6 +381,7 @@ class PlayGame():
         self.board = board
         # self.sideMenuAssistance()
 
+        self.loadBoardState()
         self.playGame()
         self.allocationStage()
         self.play()
@@ -447,19 +448,23 @@ class PlayGame():
         print ("this is the allocation of your troops")
         #implementing breadth first search for nodes around the users current nodes for troop allocation
         # Traversing the network graph to find neighbouring nodes
-        for CurrentNode in self.current_player_data["playerOccupied"]:
+        for current_node in self.current_player_data["playerOccupied"]:
             #print("this is the node in the allocation stage", node)
-            CurrentVertexList = self.network_graph[CurrentNode]
-            #print (CurrentVertexList)
-            for vertex in CurrentVertexList:
+            current_vertex_list = self.network_graph[current_node]
+            #print (current_vertex_list)
+            for vertex in current_vertex_list:
                 count = count + 1
         print ("the number of troopps that the player will receive is", count)
         NoOfTroops = count
 
+    def loadBoardState(self):
+
         for node in self.network_graph:
             if node in self.player1:
-                #self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
-                pass
+                self.board.game_display.blit(pygame.image.load(self.player1_shield), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
+            elif node in self.player2:
+                self.board.game_display.blit(pygame.image.load(self.player2_shield), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
+
 
         pygame.display.update()
 
