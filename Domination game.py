@@ -322,7 +322,7 @@ class PlayGame():
             "E": ["B", "D", "G"],
             "F": ["C", "D", "H"],
             "G": ["D", "E", "H", "I"],
-            "H": ["F", "G", "I"],
+            "H": ["F", "G", "I", "J"],
             "I": ["G", "H", "J"],
             "J": ["H", "I"]}
         # Variables used to store player turns
@@ -340,31 +340,35 @@ class PlayGame():
         self.player2_shield = 'Shield 2.fw.PNG'
 
         self.player1 = {
-            "playerOccupied": [],
-            "A": [],  # Part of dict storing No, of troops
-            "B": [],
-            "C": [],
-            "D": [],
-            "E": [],
-            "F": [],
-            "G": [],
-            "H": [],
-            "I": [],
-            "J": []}
+            "playerOccupied": ["A","D", "E","H", "I"],
+            "A": 0,
+            "B": 0,
+            "C": 0,
+            "D": 0,
+            "E": 0,
+            "F": 0,
+            "G": 0,
+            "H": 0,
+            "I": 0,
+            "J": 0}
+        for node in self.player1["playerOccupied"]:
+            self.player1[node] = len(self.network_graph[node])
+
+
+        print(self.player1)
         self.player1_no_of_territories = 0
         self.player2 = {
-            ###TODO remove this hardcoding
-            "playerOccupied": ["A","D", "G", "I"],
+            "playerOccupied": ["B", "C", "F", "G", "J"],
             "A": [],  # Part of dict storing No, of troops
-            "B": [],
-            "C": [],
+            "B": [len(self.network_graph["B"])],
+            "C": [len(self.network_graph["C"])],
             "D": [],
             "E": [],
-            "F": [],
-            "G": [],
+            "F": [len(self.network_graph["F"])],
+            "G": [len(self.network_graph["G"])],
             "H": [],
             "I": [],
-            "J": []}
+            "J": [len(self.network_graph["J"])]}
         self.player2_no_of_territories = 0
         # print (self.player1["p1Occupied"])
 
@@ -448,6 +452,11 @@ class PlayGame():
                 count = count + 1
         print ("the number of troopps that the player will receive is", count)
         NoOfTroops = count
+
+        for node in self.network_graph:
+            if node in self.player1:
+                #self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
+                pass
 
         pygame.display.update()
 
