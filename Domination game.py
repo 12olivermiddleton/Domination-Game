@@ -351,15 +351,13 @@ class PlayGame():
 
         # Varioables used for the change between players
         self.current_player = "p2"
-        self.current_shield = ""
         self.current_player_data = {}
         self.current_player_no_of_territories = 0
         # sets up dictionary for main game loop
         # self.currentNode = 'A'
-        self.player1_shield = 'Shield 5.fw.PNG'
-        self.player2_shield = 'Shield 2.fw.PNG'
 
         self.player1 = {
+            "shield": "Shield 5.fw.PNG",
             "playerOccupied": ["A", "D", "E", "H", "I"]}
         # player 1 initial territory allocation
         for node in self.player1["playerOccupied"]:
@@ -367,6 +365,7 @@ class PlayGame():
 
         self.player1_no_of_territories = 0
         self.player2 = {
+            "shield": "Shield 2.fw.PNG",
             "playerOccupied": ["B", "C", "F", "G", "J"]}
         # player 2 initial territory allocation
         for node in self.player2["playerOccupied"]:
@@ -381,7 +380,8 @@ class PlayGame():
         self.board = board
         # self.sideMenuAssistance()
 
-        self.loadBoardState()
+        self.loadBoardState(self.player1)
+        self.loadBoardState(self.player2)
         self.playGame()
         self.allocationStage()
         self.play()
@@ -391,7 +391,6 @@ class PlayGame():
         if self.current_player == "p1":
             self.current_player_data = self.player1
             self.current_player_no_of_territories = self.player1_no_of_territories
-            self.current_shield = self.player1_shield
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p2"
@@ -399,7 +398,6 @@ class PlayGame():
         else:
             self.current_player_data = self.player2
             self.current_player_no_of_territories = self.player2_no_of_territories
-            self.current_shield = self.player2_shield
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p1"
@@ -457,15 +455,11 @@ class PlayGame():
         print ("the number of troopps that the player will receive is", count)
         NoOfTroops = count
 
-    def loadBoardState(self):
+    def loadBoardState(self, player):
 
         for node in self.network_graph:
-            if node in self.player1:
-                self.board.game_display.blit(pygame.image.load(self.player1_shield), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
-            elif node in self.player2:
-                self.board.game_display.blit(pygame.image.load(self.player2_shield), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
-
-
+            if node in player:
+                self.board.game_display.blit(pygame.image.load(player["shield"]), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
         pygame.display.update()
 
     def makeMove(self):
