@@ -138,7 +138,7 @@ class Icon(Graphic):
         self.x = x
         self.y = y
         # Icon sizing
-        self.height = 30
+        self.height = 60
         self.width = 30
         self.node = node
         self.shield = shield
@@ -305,7 +305,7 @@ class Board():
 
         # Drawing the icons onto the map
         for icon in self.icon_list:
-            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.height, icon.width))
+            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.width, icon.height))
             pygame.display.update()
 
         return self
@@ -340,35 +340,18 @@ class PlayGame():
         self.player2_shield = 'Shield 2.fw.PNG'
 
         self.player1 = {
-            "playerOccupied": ["A","D", "E","H", "I"],
-            "A": 0,
-            "B": 0,
-            "C": 0,
-            "D": 0,
-            "E": 0,
-            "F": 0,
-            "G": 0,
-            "H": 0,
-            "I": 0,
-            "J": 0}
+            "playerOccupied": ["A", "D", "E", "H", "I"]}
+        # player 1 initial territory allocation
         for node in self.player1["playerOccupied"]:
             self.player1[node] = len(self.network_graph[node])
 
-
-        print(self.player1)
         self.player1_no_of_territories = 0
         self.player2 = {
-            "playerOccupied": ["B", "C", "F", "G", "J"],
-            "A": [],  # Part of dict storing No, of troops
-            "B": [len(self.network_graph["B"])],
-            "C": [len(self.network_graph["C"])],
-            "D": [],
-            "E": [],
-            "F": [len(self.network_graph["F"])],
-            "G": [len(self.network_graph["G"])],
-            "H": [],
-            "I": [],
-            "J": [len(self.network_graph["J"])]}
+            "playerOccupied": ["B", "C", "F", "G", "J"]}
+        # player 2 initial territory allocation
+        for node in self.player2["playerOccupied"]:
+            self.player2[node] = len(self.network_graph[node])
+
         self.player2_no_of_territories = 0
         # print (self.player1["p1Occupied"])
 
