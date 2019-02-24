@@ -327,7 +327,7 @@ class Board():
         return self
 
 class PlayGame():
-    def __init__(self, board):
+    def __init__(self, board, side_menu_left, side_menu_right):
         # side menu assistance variables
         self.network_graph = {
             "A": {"connections": ["B"],
@@ -400,6 +400,9 @@ class PlayGame():
         ##            print("this is a valid move")
         self.crashed = False
         self.board = board
+        self.side_menu_left = side_menu_left
+        self.side_menu_right = side_menu_right
+
         # self.sideMenuAssistance()
 
         self.loadBoardState(self.player1, self.player2)
@@ -436,6 +439,17 @@ class PlayGame():
                                 else:
                                     print(icon.node, "node")
                                     self.mouse_selected_node = icon.node
+                        btn_allocate_xpos = self.side_menu_left.x_pos_stage_allocate
+                        btn_allocate_width = self.side_menu_left.stage_button_width
+                        btn_stage_ypos = self.side_menu_left.y_pos_stage_menu
+                        btn_stage_height = self.side_menu_left.stage_height
+
+                        if btn_allocate_xpos + btn_allocate_width > mouse[0] > btn_allocate_xpos and btn_stage_ypos + btn_stage_height > mouse[1] > btn_stage_height:
+                            print ("allocated :)")
+                        else:
+                            print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
+                            print("unable to allocate y", btn_stage_ypos + btn_stage_height, '<', mouse[1], '<', btn_stage_height)
+
                                 ### TODO need a visual indication that a node is selected
                     elif event.type == pygame.KEYDOWN:
                         if self.mouse_selected_node:
@@ -606,7 +620,9 @@ if __name__ == "__main__":
                         if button_number == 1:
                             pygame.quit()
                             board = Board()
-                            play = PlayGame(board)
+                            side_menu_left = SideMenuLeft()
+                            side_menu_right = SideMenuRight()
+                            play = PlayGame(board, side_menu_left, side_menu_right)
                         elif button_number == 2:
                             ### need to add in a load game function
                             pass
