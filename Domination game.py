@@ -358,7 +358,9 @@ class PlayGame():
 
         self.player1 = {
             "shield": "Shield 5.fw.PNG",
-            "playerOccupied": ["A", "D", "E", "H", "I"]}
+            "playerOccupied": ["A", "D", "E", "H", "I"],
+            "unallocated_troops": 0
+        }
         # player 1 initial territory allocation
         for node in self.player1["playerOccupied"]:
             self.player1[node] = len(self.network_graph[node]["connections"])
@@ -366,7 +368,9 @@ class PlayGame():
         self.player1_no_of_territories = 0
         self.player2 = {
             "shield": "Shield 2.fw.PNG",
-            "playerOccupied": ["B", "C", "F", "G", "J"]}
+            "playerOccupied": ["B", "C", "F", "G", "J"],
+            "unallocated_troops": 0
+        }
         # player 2 initial territory allocation
         for node in self.player2["playerOccupied"]:
             self.player2[node] = len(self.network_graph[node]["connections"])
@@ -384,7 +388,6 @@ class PlayGame():
         self.loadBoardState(self.player2)
         self.playGame()
         self.allocationStage()
-        self.play()
 
     def playGame(self):
 
@@ -401,15 +404,15 @@ class PlayGame():
             print(self.current_player_data)
             print(self.current_player_no_of_territories)
             self.current_player = "p1"
-        # while not self.crashed:
-        #     for event in pygame.event.get():
-        #         # print(event)
-        #         if event.type == pygame.QUIT:
-        #             pygame.quit()
-        #             quit()
-        #             self.crashed = True
-        #         mouse = pygame.mouse.get_pos()
-        #         if event.type == pygame.MOUSEBUTTONDOWN:
+
+        while not self.crashed:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                    self.crashed = True
+                mouse = pygame.mouse.get_pos()
+                # if event.type == pygame.MOUSEBUTTONDOWN:
         #             # for
         #             # for button in
         #             # print ("mouse", mouse)
@@ -442,6 +445,7 @@ class PlayGame():
 
 
     def allocationStage(self):
+        #
         count = 0
         print ("this is the allocation of your troops")
         #implementing breadth first search for nodes around the users current nodes for troop allocation
@@ -472,9 +476,6 @@ class PlayGame():
                 self.board.game_display.blit(text_surface, (centreJustifyIndent(node_pos_x, node_width, text_surface),node_pos_y + (node_height/2)))
 
 
-
-
-
         pygame.display.update()
 
     def makeMove(self):
@@ -486,17 +487,7 @@ class PlayGame():
     def fortify(self):
         pass
 
-    def play(self):
-        while not self.crashed:
-            for event in pygame.event.get():
-                # print(event)
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                    self.crashed = True
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    print("I'm a genius 222222!!")
-        pass
+
 
 
 ##    def play(self):
