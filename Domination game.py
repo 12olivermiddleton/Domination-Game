@@ -114,16 +114,26 @@ class Icons():
         self.prior_node = 'G'
         # Defines and sets up the network graph for the map
         self.network_graph = {
-            "A": ["B"],
-            "B": ["A", "C", "D", "E"],
-            "C": ["B", "F"],
-            "D": ["B", "E", "F", "G"],
-            "E": ["B", "D", "G"],
-            "F": ["C", "D", "H"],
-            "G": ["D", "E", "H", "I"],
-            "H": ["F", "G", "I"],
-            "I": ["G", "H", "J"],
-            "J": ["H", "I"]}
+            "A": {"connections": ["B"],
+                  "coords": [575, 25]},
+            "B": {"connections": ["A", "C", "D", "E"],
+                  "coords": [525, 225]},
+            "C": {"connections": ["B", "F"],
+                  "coords": [371, 473]},
+            "D": {"connections": ["B", "E", "F", "G"],
+                  "coords": [505, 518]},
+            "E": {"connections": ["B", "D", "G"],
+                  "coords": [628, 459]},
+            "F": {"connections": ["C", "D", "H"],
+                  "coords": [414, 593]},
+            "G": {"connections": ["D", "E", "H", "I"],
+                  "coords": [613, 593]},
+            "H": {"connections": ["F", "G", "I"],
+                  "coords": [468, 704]},
+            "I": {"connections": ["G", "H", "J"],
+                  "coords": [620, 735]},
+            "J": {"connections": ["H", "I"],
+                  "coords": [492, 853]}}
         print(*self.network_graph["B"])
         if self.user_node in self.network_graph[self.prior_node]:
             print("I am a genius!!!")
@@ -315,16 +325,26 @@ class PlayGame():
     def __init__(self, board):
         # side menu assistance variables
         self.network_graph = {
-            "A": ["B"],
-            "B": ["A", "C", "D", "E"],
-            "C": ["B", "F"],
-            "D": ["B", "E", "F", "G"],
-            "E": ["B", "D", "G"],
-            "F": ["C", "D", "H"],
-            "G": ["D", "E", "H", "I"],
-            "H": ["F", "G", "I", "J"],
-            "I": ["G", "H", "J"],
-            "J": ["H", "I"]}
+            "A": {"connections": ["B"],
+                  "coords": [575, 25]},
+            "B": {"connections": ["A", "C", "D", "E"],
+                  "coords": [525, 225]},
+            "C": {"connections": ["B", "F"],
+                  "coords": [371, 473]},
+            "D": {"connections": ["B", "E", "F", "G"],
+                  "coords": [505, 518]},
+            "E": {"connections": ["B", "D", "G"],
+                  "coords": [628, 459]},
+            "F": {"connections": ["C", "D", "H"],
+                  "coords": [414, 593]},
+            "G": {"connections": ["D", "E", "H", "I"],
+                  "coords": [613, 593]},
+            "H": {"connections": ["F", "G", "I"],
+                  "coords": [468, 704]},
+            "I": {"connections": ["G", "H", "J"],
+                  "coords": [620, 735]},
+            "J": {"connections": ["H", "I"],
+                  "coords": [492, 853]}}
         # Variables used to store player turns
         self.player1_turns = 0
         self.player2_turns = 0
@@ -343,14 +363,14 @@ class PlayGame():
             "playerOccupied": ["A", "D", "E", "H", "I"]}
         # player 1 initial territory allocation
         for node in self.player1["playerOccupied"]:
-            self.player1[node] = len(self.network_graph[node])
+            self.player1[node] = len(self.network_graph[node]["connections"])
 
         self.player1_no_of_territories = 0
         self.player2 = {
             "playerOccupied": ["B", "C", "F", "G", "J"]}
         # player 2 initial territory allocation
         for node in self.player2["playerOccupied"]:
-            self.player2[node] = len(self.network_graph[node])
+            self.player2[node] = len(self.network_graph[node]["connections"])
 
         self.player2_no_of_territories = 0
         # print (self.player1["p1Occupied"])
