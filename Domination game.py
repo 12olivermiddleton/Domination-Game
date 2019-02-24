@@ -191,7 +191,7 @@ class SideMenuLeft():
         self.btn_quit = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, self.menu_button_width, self.menu_button_height)
 
 
-    def drawItems(self, surface):  # example of method overloading
+    def drawItems(self, surface, stage):  # example of method overloading
         # border lines for side menu
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3) # across bottom
@@ -205,8 +205,6 @@ class SideMenuLeft():
 
         # side menu left stages buttons
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
-        pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
-        pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
 
         def centreJustifyIndent(indent, button_width, text_object):
             return indent + round((button_width - text_object.get_width()) /2)
@@ -230,9 +228,16 @@ class SideMenuLeft():
         allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
         attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
         fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
-        surface.blit(allocation_text, (centreJustifyIndent(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
-        surface.blit(attack_text, (centreJustifyIndent(self.x_pos_stage_attack, self.stage_button_width, attack_text), 890))
-        surface.blit(fortify_text, (centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
+
+        if stage > 0:
+            surface.blit(allocation_text, (centreJustifyIndent(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
+        if stage > 1:
+            pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
+            surface.blit(attack_text,(centreJustifyIndent(self.x_pos_stage_attack, self.stage_button_width, attack_text), 890))
+        if stage > 2:
+            pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
+            surface.blit(fortify_text,(centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
+
 
 
 class SideMenuRight():
@@ -259,6 +264,7 @@ class Board():
         self.board_height = 941 # width of map jpg
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
+        self.stage = 1
 
         # Side menu right
         self.side_menu_right = SideMenuRight()
@@ -279,7 +285,7 @@ class Board():
         self.game_display.fill(Colour.darkGrey)
         self.clock = pygame.time.Clock()
         ######
-        self.side_menu_left.drawItems(self.game_display)
+        self.side_menu_left.drawItems(self.game_display, self.stage)
         self.setUpIcons()
         self.DisplayMap()
 
@@ -413,6 +419,11 @@ class PlayGame():
                     self.crashed = True
                 mouse = pygame.mouse.get_pos()
                 # if event.type == pygame.MOUSEBUTTONDOWN:
+                    # print (board.stage)
+                    # board.stage = board.stage + 1
+                    # board.side_menu_left.drawItems(board.game_display, board.stage)
+                    # pygame.display.update()
+
         #             # for
         #             # for button in
         #             # print ("mouse", mouse)
