@@ -406,9 +406,6 @@ class PlayGame():
         self.playGame()
         self.allocationStage()
 
-
-###TODO sort out current players and call in players as an object
-
     def playGame(self):
 
         if self.current_player == "p1":
