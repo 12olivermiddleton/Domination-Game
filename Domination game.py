@@ -148,7 +148,7 @@ class Icon(Graphic):
         self.x = x
         self.y = y
         # Icon sizing
-        self.height = 60
+        self.height = 30
         self.width = 30
         self.node = node
         self.shield = shield
@@ -457,9 +457,24 @@ class PlayGame():
 
     def loadBoardState(self, player):
 
+        def centreJustifyIndent(indent, button_width, text_object):
+            return indent + round((button_width - text_object.get_width()) /2)
+
         for node in self.network_graph:
             if node in player:
-                self.board.game_display.blit(pygame.image.load(player["shield"]), (self.network_graph[node]["coords"][0], self.network_graph[node]["coords"][1]))
+                node_pos_x = self.network_graph[node]["coords"][0]
+                node_pos_y = self.network_graph[node]["coords"][1]
+                node_width = 30
+                node_height = 60
+                self.board.game_display.blit(pygame.image.load(player["shield"]), (node_pos_x, node_pos_y))
+                myfont = pygame.font.SysFont("Comic Sans MS", 20)
+                text_surface = myfont.render(str(player[node]), False, Colour.green)
+                self.board.game_display.blit(text_surface, (centreJustifyIndent(node_pos_x, node_width, text_surface),node_pos_y + (node_height/2)))
+
+
+
+
+
         pygame.display.update()
 
     def makeMove(self):
