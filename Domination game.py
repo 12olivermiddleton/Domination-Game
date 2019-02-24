@@ -115,7 +115,7 @@ class Icons():
         # Defines and sets up the network graph for the map
         self.network_graph = {
             "A": {"connections": ["B"],
-                  "coords": [575, 25]},
+                  "coords": [520, 25]},
             "B": {"connections": ["A", "C", "D", "E"],
                   "coords": [525, 225]},
             "C": {"connections": ["B", "F"],
@@ -291,7 +291,7 @@ class Board():
 
     def setUpIcons(self):
         # X and Y coordinates of each icon
-        self.icon_list.append(Icon(self.icon_colour, 575, 25, "A", 'Shield1.fw.PNG'))
+        self.icon_list.append(Icon(self.icon_colour, 520, 25, "A", 'Shield1.fw.PNG'))
         self.icon_list.append(Icon(self.icon_colour, 525, 225, "B", 'Shield1.fw.PNG'))
         self.icon_list.append(Icon(self.icon_colour, 371, 473, "C", 'Shield1.fw.PNG'))
         self.icon_list.append(Icon(self.icon_colour, 505, 518, "D", 'Shield1.fw.PNG'))
@@ -326,7 +326,7 @@ class PlayGame():
         # side menu assistance variables
         self.network_graph = {
             "A": {"connections": ["B"],
-                  "coords": [575, 25]},
+                  "coords": [520, 25]},
             "B": {"connections": ["A", "C", "D", "E"],
                   "coords": [525, 225]},
             "C": {"connections": ["B", "F"],
@@ -468,7 +468,7 @@ class PlayGame():
                 node_height = 60
                 self.board.game_display.blit(pygame.image.load(player["shield"]), (node_pos_x, node_pos_y))
                 myfont = pygame.font.SysFont("Comic Sans MS", 20)
-                text_surface = myfont.render(str(player[node]), False, Colour.green)
+                text_surface = myfont.render(str(player[node]), False, Colour.white)
                 self.board.game_display.blit(text_surface, (centreJustifyIndent(node_pos_x, node_width, text_surface),node_pos_y + (node_height/2)))
 
 
