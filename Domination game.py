@@ -243,7 +243,7 @@ class SideMenuLeft():
 class SideMenuRight():
     def __init__(self):
 
-        # Sections
+        # Colours
         self.status_colour = Colour.white
         self.current_colour = Colour.red
 
@@ -251,6 +251,28 @@ class SideMenuRight():
         self.menu_width = 300
         self.menu_height = 0
 
+        # btn confirm to next stage
+        self.btn_colour = Colour.medium_blue
+        self.btn_confirm_xpos = 913
+        self.btn_confirm_ypos = 875
+        self.btn_confirm_width = 200
+        self.btn_confirm_height = 75
+        # formatting the confirm button text
+        self.btn_confirm_xpos_indent = 20
+        self.btn_confirm_text_ypos = 895
+
+    def drawItems(self, surface, stage):
+
+        pygame.draw.rect(surface, self.btn_colour, (self.btn_confirm_xpos, self.btn_confirm_ypos, self.btn_confirm_width, self.btn_confirm_height))
+
+        def centreJustifyIndent(indent, button_width, text_object):
+            return indent + round((button_width - text_object.get_width()) /2)
+
+
+        domination_font = CustomFont()
+        btn_confirm_text = domination_font.menu_button.render("Confirm", False, self.status_colour)
+        surface.blit(btn_confirm_text, (centreJustifyIndent(self.btn_confirm_xpos,self.btn_confirm_width, btn_confirm_text), self.btn_confirm_text_ypos))
+        pygame.display.update()
 
 class Board():
     def __init__(self):
@@ -286,6 +308,7 @@ class Board():
         self.clock = pygame.time.Clock()
         ######
         self.side_menu_left.drawItems(self.game_display, self.stage)
+        self.side_menu_right.drawItems(self.game_display, self.stage)
         self.setUpIcons()
         self.DisplayMap()
 
@@ -407,67 +430,6 @@ class PlayGame():
 
         self.loadBoardState(self.player1, self.player2)
         self.playGame()
-        self.allocationStage()
-
-    def playGame(self):
-
-        if self.current_player == "p1":
-            self.current_player_data = self.player1
-            self.opposition_player_data = self.player2
-            self.current_player_no_of_territories = self.player1_no_of_territories
-            self.current_player = "p2"
-
-        else:
-            self.current_player_data = self.player2
-            self.opposition_player_data = self.player1
-            self.current_player_no_of_territories = self.player2_no_of_territories
-            self.current_player = "p1"
-
-        while not self.crashed:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                    self.crashed = True
-                mouse = pygame.mouse.get_pos()
-                if board.stage == 1:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        for icon in board.icon_list:
-                            if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-                                if icon.node not in self.current_player_data["playerOccupied"]:
-                                    self.mouse_selected_node = ""
-                                else:
-                                    print(icon.node, "node")
-                                    self.mouse_selected_node = icon.node
-                        btn_allocate_xpos = self.side_menu_left.x_pos_stage_allocate
-                        btn_allocate_width = self.side_menu_left.stage_button_width
-                        btn_stage_ypos = self.side_menu_left.y_pos_stage_menu
-                        btn_stage_height = self.side_menu_left.stage_height
-
-                        if btn_allocate_xpos + btn_allocate_width > mouse[0] > btn_allocate_xpos and btn_stage_ypos + btn_stage_height > mouse[1] > btn_stage_height:
-                            print ("allocated :)")
-                        else:
-                            print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
-                            print("unable to allocate y", btn_stage_ypos + btn_stage_height, '<', mouse[1], '<', btn_stage_height)
-
-                                ### TODO need a visual indication that a node is selected
-                    elif event.type == pygame.KEYDOWN:
-                        if self.mouse_selected_node:
-                            print("selected node: " + self.mouse_selected_node)
-                            if event.key == pygame.K_UP:
-                                if self.current_player_data["unallocated_troops"] > 0:
-                                    self.current_player_data["unallocated_troops"] = self.current_player_data["unallocated_troops"] - 1
-                                    self.current_player_data["troops_at_node"][self.mouse_selected_node] = self.current_player_data["troops_at_node"][self.mouse_selected_node] + 1
-
-                            elif event.key == pygame.K_DOWN:
-                                if self.current_player_data["troops_at_node"][self.mouse_selected_node] > 1:
-                                    self.current_player_data["unallocated_troops"] = self.current_player_data[ "unallocated_troops"] + 1
-                                    self.current_player_data["troops_at_node"][self.mouse_selected_node] = self.current_player_data["troops_at_node"][self.mouse_selected_node] - 1
-                            self.loadBoardState(self.current_player_data, self.opposition_player_data)
-                        else:
-                            print("no mouse selected node!" + self.mouse_selected_node)
-
-
 
 
 
@@ -551,6 +513,82 @@ class PlayGame():
 
     def fortify(self):
         pass
+
+
+    def playGame(self):
+
+        if self.current_player == "p1":
+            self.current_player_data = self.player1
+            self.opposition_player_data = self.player2
+            self.current_player_no_of_territories = self.player1_no_of_territories
+            self.current_player = "p2"
+
+        else:
+            self.current_player_data = self.player2
+            self.opposition_player_data = self.player1
+            self.current_player_no_of_territories = self.player2_no_of_territories
+            self.current_player = "p1"
+
+        self.allocationStage()
+
+        while not self.crashed:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                    self.crashed = True
+                mouse = pygame.mouse.get_pos()
+                if board.stage == 1:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        for icon in board.icon_list:
+                            if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
+                                if icon.node not in self.current_player_data["playerOccupied"]:
+                                    self.mouse_selected_node = ""
+                                else:
+                                    print(icon.node, "node")
+                                    self.mouse_selected_node = icon.node
+                        btn_allocate_xpos = self.side_menu_left.x_pos_stage_allocate
+                        btn_allocate_width = self.side_menu_left.stage_button_width
+                        btn_stage_ypos = self.side_menu_left.y_pos_stage_menu
+                        btn_stage_height = self.side_menu_left.stage_height
+
+                        btn_confirm_xpos = self.side_menu_right.btn_confirm_xpos
+                        btn_confirm_ypos = self.side_menu_right.btn_confirm_ypos
+                        btn_confirm_width = self.side_menu_right.btn_confirm_width
+                        btn_confirm_height = self.side_menu_right.btn_confirm_height
+
+                        if btn_allocate_xpos + btn_allocate_width > mouse[0] > btn_allocate_xpos and btn_stage_ypos + btn_stage_height > mouse[1] > btn_stage_height:
+                            print ("allocated :)")
+                            if btn_confirm_xpos + btn_confirm_width > mouse[0]> btn_confirm_xpos and btn_confirm_ypos + btn_confirm_height > mouse[1] > btn_confirm_ypos:
+                                print("confirmed stage of attack!")
+                                board.stage = board.stage + 1
+                                self.attack()
+                                pygame.display.update()
+
+                        else:
+                            print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
+                            print("unable to allocate y", btn_stage_ypos + btn_stage_height, '<', mouse[1], '<', btn_stage_height)
+
+                                ### TODO need a visual indication that a node is selected
+                    elif event.type == pygame.KEYDOWN:
+                        if self.mouse_selected_node:
+                            print("selected node: " + self.mouse_selected_node)
+                            if event.key == pygame.K_UP:
+                                if self.current_player_data["unallocated_troops"] > 0:
+                                    self.current_player_data["unallocated_troops"] = self.current_player_data["unallocated_troops"] - 1
+                                    self.current_player_data["troops_at_node"][self.mouse_selected_node] = self.current_player_data["troops_at_node"][self.mouse_selected_node] + 1
+
+                            elif event.key == pygame.K_DOWN:
+                                if self.current_player_data["troops_at_node"][self.mouse_selected_node] > 1:
+                                    self.current_player_data["unallocated_troops"] = self.current_player_data[ "unallocated_troops"] + 1
+                                    self.current_player_data["troops_at_node"][self.mouse_selected_node] = self.current_player_data["troops_at_node"][self.mouse_selected_node] - 1
+                            self.loadBoardState(self.current_player_data, self.opposition_player_data)
+                        else:
+                            print("no mouse selected node!" + self.mouse_selected_node)
+                elif board.stage == 2:
+                    print("Now proceeding to the next stage! ")
+
+
 
 
 
