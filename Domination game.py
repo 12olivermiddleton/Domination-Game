@@ -4,6 +4,7 @@
 # things to do
 # flow of game display
 import pygame
+import re
 import time
 
 
@@ -154,6 +155,43 @@ class Icon(Graphic):
         self.shield = shield
 
 
+def centreJustifyButton(button_xpos, button_width, text_object):
+    return button_xpos + round((button_width - text_object.get_width()) / 2)
+
+
+def verticalJustifyButton(button_ypos, button_height, text_object):
+    return button_ypos + round((button_height - text_object.get_height()) / 2)
+
+
+class PaperButton():
+    def __init__(self):
+        # defaults
+        self.button_rectangle = (0, 0, 0, 0)
+        self.save_text_x = 0
+        self.save_text_y = 0
+        self.btn_label = ""
+        self.text_on_paper = Colour.black
+        self.domination_font = CustomFont()
+        self.picture = pygame.image.load("empty aged paper.jpg")
+
+    def drawButton(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text):
+        self.picture = pygame.image.load(background_image)
+        self.picture = pygame.transform.scale(self.picture, (btn_width, btn_height))
+        self.button_rectangle = self.picture.get_rect()
+        self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
+        if any(char.isalpha() for char in str(btn_text)):
+            btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
+        else:
+            myfont = pygame.font.SysFont("Comic Sans MS", 20)
+            btn_label = myfont.render(str(btn_text), False, self.text_on_paper)
+
+        surface.blit(self.picture, self.button_rectangle)
+        print( 'Button', btn_width, btn_height, btn_x, btn_y, btn_text)
+
+        btn_label_x = centreJustifyButton(self.button_rectangle.x, self.button_rectangle.width, btn_label)
+        btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
+        surface.blit(btn_label, (btn_label_x, btn_label_y))
+
 class SideMenuLeft():
     # relative sizing for buttons and menus
 
@@ -173,6 +211,7 @@ class SideMenuLeft():
         self.x_pos_stage_fortify = round(self.menu_width/3)*2
 
         self.status_colour = Colour.white
+        self.text_on_paper = Colour.black
         self.current_colour = Colour.red
         self._stage_colour = Colour.black
 
@@ -186,11 +225,6 @@ class SideMenuLeft():
         self.menu_button_width = self.menu_width - 2 * self.x_pos_menu_buttons_container_indent # pad either side
         self.menu_button_vertical_spacing = self.menu_button_height + self.menu_button_vertical_gap
 
-        self.btn_save = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, self.menu_button_width, self.menu_button_height)
-        self.btn_info = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, self.menu_button_width, self.menu_button_height)
-        self.btn_quit = (self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, self.menu_button_width, self.menu_button_height)
-
-
     def drawItems(self, surface, stage):  # example of method overloading
         # border lines for side menu
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
@@ -199,80 +233,93 @@ class SideMenuLeft():
         pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
 
         # side menu left buttons
-        pygame.draw.rect(surface, Colour.medium_blue, self.btn_save)
-        pygame.draw.rect(surface, Colour.medium_blue, self.btn_info)
-        pygame.draw.rect(surface, Colour.medium_blue, self.btn_quit)
+        btn_background = "empty aged paper.jpg"
+        btn_save = PaperButton()
+        btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game")
+        btn_info = PaperButton()
+        btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info")
+        btn_quit = PaperButton()
+        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit")
 
         # side menu left stages buttons
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
 
-        def centreJustifyIndent(indent, button_width, text_object):
-            return indent + round((button_width - text_object.get_width()) /2)
-
         domination_font = CustomFont()
         header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
         header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
-        surface.blit(header_text1, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text1), 5))
-        surface.blit(header_text2, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text2), 75))
-
-        save_text = domination_font.menu_button.render("Save Game", False, self.status_colour)
-        help_text = domination_font.menu_button.render("Info", False, self.status_colour)
-        quit_text = domination_font.menu_button.render("Quit", False, self.status_colour)
-        surface.blit(save_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, save_text), 155))
-        surface.blit(help_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, help_text), 255))
-        surface.blit(quit_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent,self.menu_button_width, quit_text), 355))
-
+        surface.blit(header_text1, (centreJustifyButton(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text1), 5))
+        surface.blit(header_text2, (centreJustifyButton(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text2), 75))
+        
         stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
-        surface.blit(stage_text, (centreJustifyIndent(self.x_pos_menu_buttons_container_indent, self.menu_button_width, stage_text), 825))
+        surface.blit(stage_text, (centreJustifyButton(self.x_pos_menu_buttons_container_indent, self.menu_button_width, stage_text), 825))
 
         allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
         attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
         fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
 
         if stage > 0:
-            surface.blit(allocation_text, (centreJustifyIndent(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
+            surface.blit(allocation_text, (centreJustifyButton(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
         if stage > 1:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
-            surface.blit(attack_text,(centreJustifyIndent(self.x_pos_stage_attack, self.stage_button_width, attack_text), 890))
+            surface.blit(attack_text,(centreJustifyButton(self.x_pos_stage_attack, self.stage_button_width, attack_text), 890))
         if stage > 2:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
-            surface.blit(fortify_text,(centreJustifyIndent(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
-
+            surface.blit(fortify_text,(centreJustifyButton(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
 
 
 class SideMenuRight():
-    def __init__(self):
+    def __init__(self, menu_xpos, menu_ypos, menu_height):
 
         # Colours
         self.status_colour = Colour.white
         self.current_colour = Colour.red
 
         # Menu Container
-        self.menu_width = 300
-        self.menu_height = 0
+        self.menu_xpos = menu_xpos
+        self.menu_ypos = menu_ypos
+        self.menu_width = 450
+        self.menu_height = menu_height
+
+        # Player 1 Troop area
+        self.troop_area_background = "scroll compass map 1023x757.jpg"
+        self.troop_area_colour = Colour.dark_blue
+        self.troop_area_indent_from_left = 0
+        self.troop_area_indent_from_top = 60
+        self.troop_area_width = self.menu_width
+        self.troop_area_height = 300
+        self.troop_area_xpos = self.menu_xpos + self.troop_area_indent_from_left
+        self.troop_area_ypos = self.menu_ypos + self.troop_area_indent_from_top
 
         # btn confirm to next stage
         self.btn_colour = Colour.medium_blue
-        self.btn_confirm_xpos = 913
-        self.btn_confirm_ypos = 875
+        self.btn_confirm_indent_from_left = 60
+        self.btn_confirm_indent_from_bottom = 60
         self.btn_confirm_width = 200
         self.btn_confirm_height = 75
-        # formatting the confirm button text
-        self.btn_confirm_xpos_indent = 20
-        self.btn_confirm_text_ypos = 895
+        self.btn_confirm_xpos = self.menu_xpos + self.btn_confirm_indent_from_left
+        self.btn_confirm_ypos = self.menu_ypos + self.menu_height - self.btn_confirm_height - self.btn_confirm_indent_from_bottom
 
     def drawItems(self, surface, stage):
-
-        pygame.draw.rect(surface, self.btn_colour, (self.btn_confirm_xpos, self.btn_confirm_ypos, self.btn_confirm_width, self.btn_confirm_height))
-
-        def centreJustifyIndent(indent, button_width, text_object):
-            return indent + round((button_width - text_object.get_width()) /2)
-
-
         domination_font = CustomFont()
-        btn_confirm_text = domination_font.menu_button.render("Confirm", False, self.status_colour)
-        surface.blit(btn_confirm_text, (centreJustifyIndent(self.btn_confirm_xpos,self.btn_confirm_width, btn_confirm_text), self.btn_confirm_text_ypos))
-        pygame.display.update()
+        stage_text = "Allocate troops"
+        if stage == 2:
+            stage_text = "Attack"
+        header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
+        surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
+
+    def drawTroopAllocationArea(self, surface, player):
+        # Troop Area Player 1
+        troop_area = PaperButton()
+        troop_area.drawButton(surface, self.troop_area_background, self.troop_area_width, self.troop_area_height, self.troop_area_xpos, self.troop_area_ypos, player["unallocated_troops"])
+
+
+        # Troop Area Player 2?
+
+        # # Confirm Button
+        if player["unallocated_troops"] == 0:
+            btn_confirm = PaperButton()
+            btn_confirm_background = "empty aged paper.jpg"
+            btn_confirm.drawButton(surface, btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height,self.btn_confirm_xpos, self.btn_confirm_ypos, "Confirm")
 
 class NodeGraphic():
     def __init__(self):
@@ -286,9 +333,6 @@ class NodeGraphic():
         self.highlight_border_colour = Colour.green
 
     def drawNode(self, board, player):
-        def centreJustifyIndent(indent, button_width, text_object):
-            return indent + round((button_width - text_object.get_width()) / 2)
-
         if self.selected == True:
             highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
                          self.pos_y - self.highlight_border_thickness,
@@ -299,14 +343,13 @@ class NodeGraphic():
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
         myfont = pygame.font.SysFont("Comic Sans MS", 20)
         text_surface = myfont.render(str(player["troops_at_node"][self.node_network_name]), False, Colour.white)
-        board.game_display.blit(text_surface, (centreJustifyIndent(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
+        board.game_display.blit(text_surface, (centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
 
 class Board():
     def __init__(self):
 
         # Side menu left
         self.side_menu_left = SideMenuLeft()
-
 
         # Board
         self.board_width = 484 # width of map jpg
@@ -316,9 +359,9 @@ class Board():
         self.stage = 1
 
         # Side menu right
-        self.side_menu_right = SideMenuRight()
         self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
         self.side_menu_right_position_y = 0
+        self.side_menu_right = SideMenuRight(self.side_menu_right_position_x, self.side_menu_right_position_y, self.board_height)
 
         # Display  size
         self.display_width = self.side_menu_left.menu_width + self.board_width + self.side_menu_right.menu_width
@@ -379,7 +422,7 @@ class Board():
         return self
 
 class PlayGame():
-    def __init__(self, board, side_menu_left, side_menu_right):
+    def __init__(self, board):
         # side menu assistance variables
         self.network_graph = {
             "A": {"connections": ["B"],
@@ -449,8 +492,8 @@ class PlayGame():
         ##            print("this is a valid move")
         self.crashed = False
         self.board = board
-        self.side_menu_left = side_menu_left
-        self.side_menu_right = side_menu_right
+        self.side_menu_left = board.side_menu_left
+        self.side_menu_right = board.side_menu_right
 
         # self.sideMenuAssistance()
 
@@ -521,6 +564,7 @@ class PlayGame():
                     node_shape.node_network_name = node
                     node_shape.selected = (node == self.board.mouse_selected_node)
                     node_shape.drawNode(board, player)
+                    board.side_menu_right.drawTroopAllocationArea(board.game_display, current_player)
             pygame.display.update()
         pygame.display.update()
 
@@ -682,9 +726,7 @@ if __name__ == "__main__":
                         if button_number == 1:
                             pygame.quit()
                             board = Board()
-                            side_menu_left = SideMenuLeft()
-                            side_menu_right = SideMenuRight()
-                            play = PlayGame(board, side_menu_left, side_menu_right)
+                            play = PlayGame(board)
                         elif button_number == 2:
                             ### need to add in a load game function
                             pass
