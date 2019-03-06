@@ -4,7 +4,6 @@
 # things to do
 # flow of game display
 import pygame
-import re
 import time
 
 
@@ -484,11 +483,6 @@ class Board():
         self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
 
         pygame.display.update()
-
-        # Drawing the icons onto the map
-        for icon in self.icon_list:
-            pygame.draw.rect(self.game_display, icon.colour, (icon.x, icon.y, icon.width, icon.height))
-            pygame.display.update()
 
         return self
 
