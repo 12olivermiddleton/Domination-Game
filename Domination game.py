@@ -315,7 +315,7 @@ class SideMenuLeft():
 class TroopArea():
     def __init__(self):
         # Player 1 Troop area
-        self.troop_area_background = "scroll compass map 1023x757.jpg"
+        self.troop_area_background = "scroll compass map 30pc.jpg"
         self.troop_area_indent_from_left = 0
         self.troop_area_indent_from_top = 60
         self.troop_area_width = 0
@@ -362,7 +362,7 @@ class SideMenuRight():
         self.menu_height = menu_height
 
         # Troop Area
-        self.troop_area_background = "scroll compass map 1023x757.jpg"
+        self.troop_area_background = "scroll compass map 30pc.jpg"
         troop_area_indent_from_left = 0
         self.troop_area_height = 300
         troop_area_vertical_gap = 60
