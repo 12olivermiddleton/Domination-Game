@@ -163,6 +163,23 @@ def verticalJustifyButton(button_ypos, button_height, text_object):
     return button_ypos + round((button_height - text_object.get_height()) / 2)
 
 
+game_buttons = {}
+
+
+def setButtonState(operation, button_id, button):
+    if operation == "add":
+        # add a button to the dictionary of buttons
+        game_buttons[button_id] = button
+
+    if operation == "remove":
+        # remove a button from the array of buttons
+        game_buttons.pop(button_id, None)
+
+
+def getButtonState():
+    return game_buttons
+
+
 class PaperButton():
     def __init__(self):
         # defaults
@@ -173,8 +190,39 @@ class PaperButton():
         self.text_on_paper = Colour.black
         self.domination_font = CustomFont()
         self.picture = pygame.image.load("empty aged paper.jpg")
+        self.button_id = ""
 
-    def drawButton(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text):
+    def drawButton(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text, btn_id):
+        self.picture = pygame.image.load(background_image)
+        self.picture = pygame.transform.scale(self.picture, (btn_width, btn_height))
+        self.button_id = btn_id
+        self.button_rectangle = self.picture.get_rect()
+        self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
+        if any(char.isalpha() for char in str(btn_text)):
+            btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
+        else:
+            myfont = pygame.font.SysFont("Comic Sans MS", 20)
+            btn_label = myfont.render(str(btn_text), False, self.text_on_paper)
+
+        surface.blit(self.picture, self.button_rectangle)
+
+        btn_label_x = centreJustifyButton(self.button_rectangle.x, self.button_rectangle.width, btn_label)
+        btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
+        surface.blit(btn_label, (btn_label_x, btn_label_y))
+        setButtonState("add", btn_id, self.button_rectangle)
+class PaperTroopArea():
+    def __init__(self):
+        # defaults
+        self.button_rectangle = (0, 0, 0, 0)
+        self.save_text_x = 0
+        self.save_text_y = 0
+        self.btn_label = ""
+        self.text_on_paper = Colour.black
+        self.domination_font = CustomFont()
+        self.picture = pygame.image.load("empty aged paper.jpg")
+        self.button_id = ""
+
+    def drawArea(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text):
         self.picture = pygame.image.load(background_image)
         self.picture = pygame.transform.scale(self.picture, (btn_width, btn_height))
         self.button_rectangle = self.picture.get_rect()
@@ -186,7 +234,6 @@ class PaperButton():
             btn_label = myfont.render(str(btn_text), False, self.text_on_paper)
 
         surface.blit(self.picture, self.button_rectangle)
-        print( 'Button', btn_width, btn_height, btn_x, btn_y, btn_text)
 
         btn_label_x = centreJustifyButton(self.button_rectangle.x, self.button_rectangle.width, btn_label)
         btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
@@ -235,11 +282,11 @@ class SideMenuLeft():
         # side menu left buttons
         btn_background = "empty aged paper.jpg"
         btn_save = PaperButton()
-        btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game")
+        btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game", "save")
         btn_info = PaperButton()
-        btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info")
+        btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info", "info")
         btn_quit = PaperButton()
-        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit")
+        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quite")
 
         # side menu left stages buttons
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
@@ -266,6 +313,41 @@ class SideMenuLeft():
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
             surface.blit(fortify_text,(centreJustifyButton(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
 
+class TroopArea():
+    def __init__(self):
+        # Player 1 Troop area
+        self.troop_area_background = "scroll compass map 1023x757.jpg"
+        self.troop_area_indent_from_left = 0
+        self.troop_area_indent_from_top = 60
+        self.troop_area_width = 0
+        self.troop_area_height = 300
+        self.troop_area_xpos = 0
+        self.troop_area_ypos = 0
+        self.text_on_troop_area = Colour.black
+
+        # btn confirm to next stage
+        self.btn_confirm_indent_from_left = 60
+        self.btn_confirm_indent_from_bottom = 60
+        self.btn_confirm_background = "empty aged paper.jpg"
+        self.btn_confirm_width = 200
+        self.btn_confirm_height = 75
+
+
+    def drawTroopArea(self, board, player, pos_x, pos_y, player_string):
+        domination_font = CustomFont()
+        self.troop_area_width = board.side_menu_right.menu_width
+        self.troop_area_xpos = pos_x
+        self.troop_area_ypos = pos_y
+        player_text = domination_font.menu_button.render(player_string, False, self.text_on_troop_area)
+        board.game_display.blit(player_text, (self.troop_area_xpos, self.troop_area_ypos))
+        # # Confirm Button
+        btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
+        btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
+        btn_id = "confirm" + player["shield"]
+        if player["unallocated_troops"] == 0:
+            btn_confirm = PaperButton()
+            btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
+
 
 class SideMenuRight():
     def __init__(self, menu_xpos, menu_ypos, menu_height):
@@ -280,24 +362,17 @@ class SideMenuRight():
         self.menu_width = 450
         self.menu_height = menu_height
 
-        # Player 1 Troop area
+        # Troop Area
         self.troop_area_background = "scroll compass map 1023x757.jpg"
-        self.troop_area_colour = Colour.dark_blue
-        self.troop_area_indent_from_left = 0
-        self.troop_area_indent_from_top = 60
-        self.troop_area_width = self.menu_width
+        troop_area_indent_from_left = 0
         self.troop_area_height = 300
-        self.troop_area_xpos = self.menu_xpos + self.troop_area_indent_from_left
-        self.troop_area_ypos = self.menu_ypos + self.troop_area_indent_from_top
+        troop_area_vertical_gap = 60
+        troop_area_indent_from_top = 60
+        self.player1_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.player1_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
+        self.player2_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.player2_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + troop_area_vertical_gap
 
-        # btn confirm to next stage
-        self.btn_colour = Colour.medium_blue
-        self.btn_confirm_indent_from_left = 60
-        self.btn_confirm_indent_from_bottom = 60
-        self.btn_confirm_width = 200
-        self.btn_confirm_height = 75
-        self.btn_confirm_xpos = self.menu_xpos + self.btn_confirm_indent_from_left
-        self.btn_confirm_ypos = self.menu_ypos + self.menu_height - self.btn_confirm_height - self.btn_confirm_indent_from_bottom
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
@@ -307,19 +382,15 @@ class SideMenuRight():
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
-    def drawTroopAllocationArea(self, surface, player):
-        # Troop Area Player 1
-        troop_area = PaperButton()
-        troop_area.drawButton(surface, self.troop_area_background, self.troop_area_width, self.troop_area_height, self.troop_area_xpos, self.troop_area_ypos, player["unallocated_troops"])
-
-
-        # Troop Area Player 2?
-
-        # # Confirm Button
-        if player["unallocated_troops"] == 0:
-            btn_confirm = PaperButton()
-            btn_confirm_background = "empty aged paper.jpg"
-            btn_confirm.drawButton(surface, btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height,self.btn_confirm_xpos, self.btn_confirm_ypos, "Confirm")
+    def drawTroopAllocationArea(self, surface, player1_state, player2_state):
+        player1_troop_area_backing = PaperTroopArea()
+        player2_troop_area_backing = PaperTroopArea()
+        player1_troop_area_backing.drawArea(surface, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
+        player2_troop_area_backing.drawArea(surface, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
+        player1_troop_area = TroopArea()
+        player2_troop_area = TroopArea()
+        player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos, "Player One")
+        player2_troop_area.drawTroopArea(board, player2_state, self.player2_troop_area_xpos, self.player2_troop_area_ypos, "Player Two")
 
 class NodeGraphic():
     def __init__(self):
@@ -451,7 +522,7 @@ class PlayGame():
         self.player2_turns = 0
 
         # Varioables used for the change between players
-        self.current_player = "p2"
+        self.current_player = "p1"
         self.current_player_data = {}
         self.current_player_no_of_territories = 0
         # sets up dictionary for main game loop
@@ -498,7 +569,7 @@ class PlayGame():
         # self.sideMenuAssistance()
 
         self.loadBoardState(self.player1, self.player2)
-        self.playGame()
+        self.playGame(self.current_player, board.stage)
 
 
 
@@ -564,7 +635,7 @@ class PlayGame():
                     node_shape.node_network_name = node
                     node_shape.selected = (node == self.board.mouse_selected_node)
                     node_shape.drawNode(board, player)
-                    board.side_menu_right.drawTroopAllocationArea(board.game_display, current_player)
+                    board.side_menu_right.drawTroopAllocationArea(board.game_display, self.player1, self.player2)
             pygame.display.update()
         pygame.display.update()
 
@@ -572,27 +643,32 @@ class PlayGame():
         pass
 
     def attack(self):
+        print ("Executing Attack function")
         pass
 
     def fortify(self):
         pass
 
 
-    def playGame(self):
+    def playGame(self, player, stage):
+
+        self.current_player = player
 
         if self.current_player == "p1":
             self.current_player_data = self.player1
             self.opposition_player_data = self.player2
             self.current_player_no_of_territories = self.player1_no_of_territories
-            self.current_player = "p2"
 
         else:
             self.current_player_data = self.player2
             self.opposition_player_data = self.player1
             self.current_player_no_of_territories = self.player2_no_of_territories
-            self.current_player = "p1"
 
-        self.allocationStage()
+        if stage == 1:
+            self.allocationStage()
+        elif stage == 2:
+            print("confirmed stage of attack!")
+            self.attack()
 
         while not self.crashed:
             for event in pygame.event.get():
@@ -612,7 +688,6 @@ class PlayGame():
                                 if icon.node not in self.current_player_data["playerOccupied"]:
                                     board.mouse_selected_node = ""
                                 else:
-                                    print(icon.node, "node")
                                     if board.mouse_selected_node != icon.node:  # A different node has been selected
                                         board.mouse_selected_node = icon.node
                                         self.loadBoardState(self.current_player_data, self.opposition_player_data)
@@ -620,19 +695,15 @@ class PlayGame():
                         btn_allocate_width = self.side_menu_left.stage_button_width
                         btn_stage_ypos = self.side_menu_left.y_pos_stage_menu
                         btn_stage_height = self.side_menu_left.stage_height
-
-                        btn_confirm_xpos = self.side_menu_right.btn_confirm_xpos
-                        btn_confirm_ypos = self.side_menu_right.btn_confirm_ypos
-                        btn_confirm_width = self.side_menu_right.btn_confirm_width
-                        btn_confirm_height = self.side_menu_right.btn_confirm_height
-
-                        if btn_allocate_xpos + btn_allocate_width > mouse[0] > btn_allocate_xpos and btn_stage_ypos + btn_stage_height > mouse[1] > btn_stage_height:
-                            print ("allocated :)")
-                            if btn_confirm_xpos + btn_confirm_width > mouse[0]> btn_confirm_xpos and btn_confirm_ypos + btn_confirm_height > mouse[1] > btn_confirm_ypos:
-                                print("confirmed stage of attack!")
-                                board.stage = board.stage + 1
-                                self.attack()
-                                pygame.display.update()
+                        for button in getButtonState():
+                            if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
+                                print ('Confirm pressed in button', button, self.current_player, self.current_player_data)
+                                setButtonState("remove", button, None)  # remove the confirm
+                                # Proceed to next player or next stage
+                                if self.current_player == "p1":
+                                    self.playGame("p2", board.stage)
+                                else:
+                                    self.playGame("p1", board.stage + 1)
 
                         else:
                             print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
