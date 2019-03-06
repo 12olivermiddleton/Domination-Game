@@ -188,7 +188,7 @@ class PaperButton():
         self.btn_label = ""
         self.text_on_paper = Colour.black
         self.domination_font = CustomFont()
-        self.picture = pygame.image.load("empty aged paper.jpg")
+        self.picture = pygame.image.load("empty aged paper 30pc.jpg")
         self.button_id = ""
 
     def drawButton(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text, btn_id):
@@ -218,7 +218,7 @@ class PaperTroopArea():
         self.btn_label = ""
         self.text_on_paper = Colour.black
         self.domination_font = CustomFont()
-        self.picture = pygame.image.load("empty aged paper.jpg")
+        self.picture = pygame.image.load("empty aged paper 30pc.jpg")
         self.button_id = ""
 
     def drawArea(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text):
@@ -279,7 +279,7 @@ class SideMenuLeft():
         pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
 
         # side menu left buttons
-        btn_background = "empty aged paper.jpg"
+        btn_background = "empty aged paper 30pc.jpg"
         btn_save = PaperButton()
         btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game", "save")
         btn_info = PaperButton()
@@ -327,7 +327,7 @@ class TroopArea():
         # btn confirm to next stage
         self.btn_confirm_indent_from_left = 60
         self.btn_confirm_indent_from_bottom = 60
-        self.btn_confirm_background = "empty aged paper.jpg"
+        self.btn_confirm_background = "empty aged paper 30pc.jpg"
         self.btn_confirm_width = 200
         self.btn_confirm_height = 75
 
@@ -698,6 +698,7 @@ class PlayGame():
                                     self.playGame("p2", board.stage)
                                 else:
                                     self.playGame("p1", board.stage + 1)
+                                    self.side_menu_left.drawItems(board.game_display, board.stage)
 
                         else:
                             print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
