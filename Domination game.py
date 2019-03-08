@@ -4,6 +4,7 @@
 # things to do
 # flow of game display
 import pygame
+import pickle
 import time
 
 
@@ -285,7 +286,7 @@ class SideMenuLeft():
         btn_info = PaperButton()
         btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info", "info")
         btn_quit = PaperButton()
-        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quite")
+        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quit")
 
         # side menu left stages buttons
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
@@ -490,7 +491,7 @@ class Board():
         return self
 
 class PlayGame():
-    def __init__(self, board):
+    def __init__(self, board, load_gamestate):
         # side menu assistance variables
         self.network_graph = {
             "A": {"connections": ["B"],
@@ -526,6 +527,7 @@ class PlayGame():
         # self.currentNode = 'A'
 
         self.player1 = {
+            "id": "p1",
             "shield": "Shield 5.fw.PNG",
             "playerOccupied": ["A", "D", "E", "H", "I"],
             "unallocated_troops": 0,
@@ -540,6 +542,7 @@ class PlayGame():
 
         self.player1_no_of_territories = 0
         self.player2 = {
+            "id": "p2",
             "shield": "Shield 2.fw.PNG",
             "playerOccupied": ["B", "C", "F", "G", "J"],
             "unallocated_troops": 0,
@@ -568,15 +571,19 @@ class PlayGame():
         self.loadBoardState(self.player1, self.player2)
         self.playGame(self.current_player, board.stage)
 
+    def saveGame(self, stage, current_player, opposition_player):
+        game_state = {
+            "stage": stage,
+            "current_player": current_player,
+            "opposition_player": opposition_player
+        }
 
-    def SaveGame(self):
-        pass
+        print('Save:', game_state)
+        with open('test_pickle.pkl', 'wb') as pickle_out:
+            pickle.dump(game_state, pickle_out)
 
-    def LoadGame(self):
-        pass
-
-        pygame.display.update()
-
+    def quitGame(self):
+        pygame.quit()
 
     def allocationStage(self):
         #
@@ -635,7 +642,7 @@ class PlayGame():
             self.current_player_data = self.player2
             self.opposition_player_data = self.player1
             self.current_player_no_of_territories = self.player2_no_of_territories
-
+        print('load', player, self.current_player_data, self.opposition_player_data)
         if stage == 1:
             self.allocationStage()
         elif stage == 2:
@@ -667,21 +674,25 @@ class PlayGame():
 
                                     self.loadBoardState(self.current_player_data, self.opposition_player_data)
 
-                    # Allocate
+                    for button in getButtonState():
+                        if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
 
-                    if board.stage == 1:
+                            # Allocate
+                            if board.stage == 1:
+                                if button == ("confirm" + self.current_player_data["shield"]):
+                                    # Proceed to next player or next stage
+                                    if self.current_player == "p1":
+                                        self.playGame("p2", board.stage)
+                                    else:
+                                        self.playGame("p1", board.stage + 1)
+                            # Save Game
+                            if button == "save":
+                                self.saveGame(board.stage, self.current_player_data, self.opposition_player_data)
 
-                        for button in getButtonState():
-                            if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
-                                print ('Confirm pressed in button', button, self.current_player, self.current_player_data)
-                                setButtonState("remove", button, None)  # remove the confirm
-                                # Proceed to next player or next stage
-                                if self.current_player == "p1":
-                                    self.playGame("p2", board.stage)
-                                else:
-                                    self.playGame("p1", board.stage + 1)
+                            # Quit Game
+                            if button == "quit":
+                                self.quitGame()
                     # Attack
-
                     if board.stage == 2:
                         if board.mouse_selected_launch_node == "" and board.mouse_selected_node != "":
                             board.mouse_selected_launch_node = board.mouse_selected_node
@@ -707,6 +718,17 @@ class PlayGame():
                     else:
                         print("no mouse selected node!" + board.mouse_selected_node)
 
+def loadGame(play_game, board):
+    with open('test_pickle.pkl', 'rb') as pickle_in:
+        game_data = pickle.load(pickle_in)
+        if game_data["current_player"]["id"] == "p1":
+            play_game.player1 = game_data["current_player"]
+            play_game.player2 = game_data["opposition_player"]
+        elif game_data["current_player"]["id"] == "p2":
+            play_game.player1 = game_data["opposition_player"]
+            play_game.player2 = game_data["current_player"]
+        board.stage = game_data["stage"]
+        play_game.playGame(game_data["current_player"]["id"], board.stage)
 
 
 if __name__ == "__main__":
@@ -751,7 +773,11 @@ if __name__ == "__main__":
                             board = Board()
                             play = PlayGame(board)
                         elif button_number == 2:
-                            ### need to add in a load game function
+                            # LOAD
+                            pygame.quit()
+                            board = Board()
+                            # play = PlayGame(board)
+                            loadGame(board)
                             pass
                         elif button_number == 3:
                             pygame.quit()
