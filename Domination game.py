@@ -404,15 +404,26 @@ class NodeGraphic():
         self.node_network_name = ""
         self.selected = False
         self.highlight_border_thickness = 2
-        self.highlight_border_colour = Colour.green
+        self.highlight_border_colour = Colour.blue
+        self.highlight_border_colour_selected = Colour.green
 
     def drawNode(self, board, player):
+        print(board.player_turn["id"], player["id"])
+        if board.player_turn["id"] == player["id"]:
+            highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
+                                   self.pos_y - self.highlight_border_thickness,
+                                   self.width + (2 * self.highlight_border_thickness),
+                                   self.height + (2 * self.highlight_border_thickness))
+            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle,
+                             self.highlight_border_thickness)
+
         if self.selected == True:
             highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
                          self.pos_y - self.highlight_border_thickness,
                          self.width + (2*self.highlight_border_thickness),
                          self.height + (2*self.highlight_border_thickness))
-            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle, self.highlight_border_thickness)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle, self.highlight_border_thickness)
+
 
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
         myfont = pygame.font.SysFont("Comic Sans MS", 20)
@@ -431,6 +442,7 @@ class Board():
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
         self.stage = 1
+        self.player_turn =""
 
         # Side menu right
         self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
@@ -571,6 +583,8 @@ class PlayGame():
         stage = game_state["stage"]
         self.network_graph = game_state["network_graph"]
 
+        board.player_turn = game_state["current_player"]
+
         if stage == 1:
             print("confirmed stage of allocate!", game_state)
             self.allocationStage(game_state)
@@ -702,6 +716,7 @@ def newGame(board):
         "opposition_player": player2,
         "network_graph":  network_graph
     }
+    board.player_turn = "p1"
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
 
