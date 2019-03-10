@@ -6,7 +6,10 @@
 import pygame
 import pickle
 import random
+import pprint
 import time
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class Colour():
@@ -403,9 +406,8 @@ class NodeGraphic():
         self.pos_x = 0
         self.pos_y = 0
         self.node_network_name = ""
-        self.selected = False
-        self.highlight_border_thickness = 2
-        self.highlight_border_colour = Colour.blue
+        self.highlight_border_thickness = 1
+        self.highlight_border_colour_available = Colour.blue
         self.highlight_border_colour_selected = Colour.green
         self.highlight_border_colour_enemy = Colour.red
 
@@ -413,22 +415,31 @@ class NodeGraphic():
 
         highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
                                self.pos_y - self.highlight_border_thickness,
-                               self.width + (2 * self.highlight_border_thickness),
-                               self.height + (2 * self.highlight_border_thickness))
+                               self.width + 2*self.highlight_border_thickness,
+                               self.height + self.highlight_border_thickness)
 
-
+        # Available to select
         if board.player_turn["id"] == player["id"]:
-            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle, self.highlight_border_thickness)
-
-
-        if self.selected == True:
-            pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle, self.highlight_border_thickness)
-
+            print("Available to select", self.node_network_name)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_available, highlight_rectangle, self.highlight_border_thickness)
+        # Selected
+        if self.node_network_name == board.mouse_selected_node:
+            print("Selected", self.node_network_name)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle)
+        # Possible Enemy Node
+        if self.node_network_name in board.possible_targets:
+            print("Possible Enemy", self.node_network_name)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_enemy, highlight_rectangle, self.highlight_border_thickness)
+        # Selected Enemy Node
+        if self.node_network_name == board.mouse_selected_attack_node:
+            print("Selected Enemy", self.node_network_name)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_enemy, highlight_rectangle)
 
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
         myfont = pygame.font.SysFont("Comic Sans MS", 20)
         text_surface = myfont.render(str(player["troops_at_node"][self.node_network_name]), False, Colour.white)
-        board.game_display.blit(text_surface, (centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
+        board.game_display.blit(text_surface, (
+        centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
 
 class Board():
     def __init__(self):
@@ -442,7 +453,8 @@ class Board():
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
         self.stage = 1
-        self.player_turn =""
+        self.player_turn = ""
+        self.possible_targets = []
 
         # Side menu right
         self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
@@ -511,7 +523,6 @@ class PlayGame():
         self.network_graph = {}
         self.current_player_data = {}
         self.opposition_player_data = {}
-        self.possible_targets = []
 
         # Variables used to store player turns
         self.player1_turns = 0
@@ -560,7 +571,6 @@ class PlayGame():
                     node_shape.pos_x = self.network_graph[node]["coords"][0]
                     node_shape.pos_y = self.network_graph[node]["coords"][1]
                     node_shape.node_network_name = node
-                    node_shape.selected = (node == self.board.mouse_selected_node)
                     node_shape.drawNode(board, player)
                     board.side_menu_right.drawTroopAllocationArea(board.game_display, player1, player2)
             pygame.display.update()
@@ -569,7 +579,7 @@ class PlayGame():
     def makeMove(self):
         pass
 
-    def nearestEnemyOfNode(self, node):
+    def nearestEnemiesOfNode(self, node):
 
         # search to find the neighbours of a node
         # find the neighbours which are enemies
@@ -579,13 +589,10 @@ class PlayGame():
             if neighbour in self.opposition_player_data["playerOccupied"]:
                 enemy_neighbours.append(neighbour)
 
-
-
-
         print ("the node", node )
         print ("the neighbours", neighbours)
         print("the neighbours that are enemies", enemy_neighbours)
-
+        return enemy_neighbours
 
     def attack(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
@@ -621,28 +628,47 @@ class PlayGame():
                     self.crashed = True
                 mouse = pygame.mouse.get_pos()
                 #######################
-                #######################
+                ##### MOUSE CLICKED ###
                 #######################
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    if board.mouse_selected_node != "":
-                        # deselect the node if anywhere is clicked
-                        board.mouse_selected_node = ""
-                        self.loadBoardState(game_state)
+                    # Was a players node selected?
                     for icon in board.icon_list:
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
+                            # A node was selected with mouse
                             if icon.node not in self.current_player_data["playerOccupied"]:
-                                board.mouse_selected_node = ""
+                                # An enemy node was selected with mouse
+                                if board.stage == 2:
+                                    if board.mouse_selected_launch_node != "":
+                                        # the launch node is present ..
+                                        if icon.node in board.possible_targets:
+                                            # and the enemy is reachable from the node
+                                            print("Enemy selected", icon.node)
+                                            board.mouse_selected_attack_node = icon.node
+                                            self.loadBoardState(game_state)
+                                    else:
+                                        # the launch node was missing
+                                        board.mouse_selected_node = ""
+                                        board.mouse_selected_attack_node = ""
+                                else:
+                                    # default stage behaviour is selecting enemy node cancels current node selection
+                                    board.mouse_selected_node = ""
                             else:
-                                if board.mouse_selected_node != icon.node:  # A different node has been selected
+                                # A node of the current player was clicked on
+                                if board.mouse_selected_node != icon.node:
+                                    # A different node of the current player was clicked on
                                     board.mouse_selected_node = icon.node
+                                    if board.stage == 2:
+                                        board.mouse_selected_launch_node = icon.node
+                                        board.mouse_selected_attack_node = ""
+                                        board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
 
                                     self.loadBoardState(game_state)
-
-                            if board.mouse_selected_launch_node != "" and board.stage == 2:
-                                board.mouse_selected_attack_node = icon.node
-                                print (icon.node, self.possible_targets)
-                                # if icon.node in self.possible_targets:
-                                #     print("selected enemy to attack", icon.node)
+                                else:
+                                    # same node clicked again
+                                    pass
+                        else:
+                            # mouse clicked away from any node
+                            pass
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
@@ -664,15 +690,6 @@ class PlayGame():
                             # Quit Game
                             if button == "quit":
                                 self.quitGame()
-                    # Attack
-                    if board.stage == 2:
-                        if board.mouse_selected_launch_node == "" and board.mouse_selected_node != "":
-
-                            # identify possible enemies from node
-
-                            board.mouse_selected_launch_node = board.mouse_selected_node
-                            print("Attacking from", board.mouse_selected_launch_node, board.mouse_selected_node)
-                            self.possible_targets = self.nearestEnemyOfNode(board.mouse_selected_launch_node)
 
 
 
