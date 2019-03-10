@@ -5,6 +5,7 @@
 # flow of game display
 import pygame
 import pickle
+import random
 import time
 
 
@@ -408,7 +409,6 @@ class NodeGraphic():
         self.highlight_border_colour_selected = Colour.green
 
     def drawNode(self, board, player):
-        print(board.player_turn["id"], player["id"])
         if board.player_turn["id"] == player["id"]:
             highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
                                    self.pos_y - self.highlight_border_thickness,
@@ -580,19 +580,19 @@ class PlayGame():
 
         self.current_player_data = game_state["current_player"]
         self.opposition_player_data = game_state["opposition_player"]
-        stage = game_state["stage"]
+        board.stage = game_state["stage"]
         self.network_graph = game_state["network_graph"]
 
         board.player_turn = game_state["current_player"]
 
-        if stage == 1:
+        if board.stage == 1:
             print("confirmed stage of allocate!", game_state)
             self.allocationStage(game_state)
-            self.loadBoardState(game_state)
-        elif stage == 2:
+        elif board.stage == 2:
             print("confirmed stage of attack!")
             self.attack(game_state)
 
+        self.loadBoardState(game_state)
         while not self.crashed:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -664,6 +664,18 @@ class PlayGame():
                     else:
                         print("no mouse selected node!" + board.mouse_selected_node)
 
+def initialTroopDeployment(player):
+    while player["unallocated_troops"] > 0:
+        random_min = 1
+        random_max = len(player["playerOccupied"])
+        node_index = random.randint(random_min, random_max) - 1
+        node_to_update = player["playerOccupied"][node_index]
+
+        player["unallocated_troops"] = player["unallocated_troops"] - 1
+        player["troops_at_node"][node_to_update] = player["troops_at_node"][node_to_update] + 1
+
+    return player
+
 def newGame(board):
     network_graph = {
         "A": {"connections": ["B"],
@@ -696,7 +708,7 @@ def newGame(board):
     # player 1 initial territory allocation
     for node in player1["playerOccupied"]:
         player1["troops_at_node"][node] = 1
-        player1["unallocated_troops"] = 1
+        player1["unallocated_troops"] = 10
 
     player2 = {
         "id": "p2",
@@ -708,7 +720,7 @@ def newGame(board):
     # player 2 initial territory allocation
     for node in player2["playerOccupied"]:
         player2["troops_at_node"][node] = 1
-        player2["unallocated_troops"] = 1
+        player2["unallocated_troops"] = 10
 
     initial_game_state = {
         "stage": board.stage,
@@ -717,6 +729,11 @@ def newGame(board):
         "network_graph":  network_graph
     }
     board.player_turn = "p1"
+
+    initial_game_state["current_player"] = initialTroopDeployment(initial_game_state["current_player"])
+    initial_game_state["opposition_player"] = initialTroopDeployment(initial_game_state["opposition_player"])
+    initial_game_state["stage"] = 2
+
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
 
