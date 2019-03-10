@@ -407,21 +407,21 @@ class NodeGraphic():
         self.highlight_border_thickness = 2
         self.highlight_border_colour = Colour.blue
         self.highlight_border_colour_selected = Colour.green
+        self.highlight_border_colour_enemy = Colour.red
 
     def drawNode(self, board, player):
+
+        highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
+                               self.pos_y - self.highlight_border_thickness,
+                               self.width + (2 * self.highlight_border_thickness),
+                               self.height + (2 * self.highlight_border_thickness))
+
+
         if board.player_turn["id"] == player["id"]:
-            highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
-                                   self.pos_y - self.highlight_border_thickness,
-                                   self.width + (2 * self.highlight_border_thickness),
-                                   self.height + (2 * self.highlight_border_thickness))
-            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle,
-                             self.highlight_border_thickness)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle, self.highlight_border_thickness)
+
 
         if self.selected == True:
-            highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
-                         self.pos_y - self.highlight_border_thickness,
-                         self.width + (2*self.highlight_border_thickness),
-                         self.height + (2*self.highlight_border_thickness))
             pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle, self.highlight_border_thickness)
 
 
@@ -506,10 +506,12 @@ class Board():
 
 class PlayGame():
     def __init__(self, board):
+
         # side menu assistance variables
         self.network_graph = {}
         self.current_player_data = {}
         self.opposition_player_data = {}
+        self.possible_targets = []
 
         # Variables used to store player turns
         self.player1_turns = 0
@@ -567,6 +569,24 @@ class PlayGame():
     def makeMove(self):
         pass
 
+    def nearestEnemyOfNode(self, node):
+
+        # search to find the neighbours of a node
+        # find the neighbours which are enemies
+        neighbours = self.network_graph[node]["connections"]
+        enemy_neighbours = []
+        for neighbour in neighbours:
+            if neighbour in self.opposition_player_data["playerOccupied"]:
+                enemy_neighbours.append(neighbour)
+
+
+
+
+        print ("the node", node )
+        print ("the neighbours", neighbours)
+        print("the neighbours that are enemies", enemy_neighbours)
+
+
     def attack(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         print ("Executing Attack function")
@@ -618,6 +638,12 @@ class PlayGame():
 
                                     self.loadBoardState(game_state)
 
+                            if board.mouse_selected_launch_node != "" and board.stage == 2:
+                                board.mouse_selected_attack_node = icon.node
+                                print (icon.node, self.possible_targets)
+                                # if icon.node in self.possible_targets:
+                                #     print("selected enemy to attack", icon.node)
+
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
                             # Allocate
@@ -641,8 +667,13 @@ class PlayGame():
                     # Attack
                     if board.stage == 2:
                         if board.mouse_selected_launch_node == "" and board.mouse_selected_node != "":
+
+                            # identify possible enemies from node
+
                             board.mouse_selected_launch_node = board.mouse_selected_node
-                            print ("Attacking from", board.mouse_selected_launch_node, board.mouse_selected_node)
+                            print("Attacking from", board.mouse_selected_launch_node, board.mouse_selected_node)
+                            self.possible_targets = self.nearestEnemyOfNode(board.mouse_selected_launch_node)
+
 
 
                 elif event.type == pygame.KEYDOWN:
