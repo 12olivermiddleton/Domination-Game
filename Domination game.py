@@ -4,6 +4,7 @@
 # things to do
 # flow of game display
 import pygame
+import pickle
 import time
 
 
@@ -58,7 +59,7 @@ class Menu():
             self.button_list.append(Button(x, y, self.game_display))
 
             if button_text_no == 1:
-                text_surface = domination_font.splash_button.render("Play Game", False, Colour.white)
+                text_surface = domination_font.splash_button.render("New Game", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
             elif button_text_no == 2:
@@ -209,6 +210,7 @@ class PaperButton():
         btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
         surface.blit(btn_label, (btn_label_x, btn_label_y))
         setButtonState("add", btn_id, self.button_rectangle)
+
 class PaperTroopArea():
     def __init__(self):
         # defaults
@@ -285,7 +287,7 @@ class SideMenuLeft():
         btn_info = PaperButton()
         btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info", "info")
         btn_quit = PaperButton()
-        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quite")
+        btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quit")
 
         # side menu left stages buttons
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
@@ -311,6 +313,7 @@ class SideMenuLeft():
         if stage > 2:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
             surface.blit(fortify_text,(centreJustifyButton(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
+        pygame.display.update()
 
 class TroopArea():
     def __init__(self):
@@ -346,6 +349,7 @@ class TroopArea():
         if player["unallocated_troops"] == 0:
             btn_confirm = PaperButton()
             btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
+
 
 
 class SideMenuRight():
@@ -400,15 +404,26 @@ class NodeGraphic():
         self.node_network_name = ""
         self.selected = False
         self.highlight_border_thickness = 2
-        self.highlight_border_colour = Colour.green
+        self.highlight_border_colour = Colour.blue
+        self.highlight_border_colour_selected = Colour.green
 
     def drawNode(self, board, player):
+        print(board.player_turn["id"], player["id"])
+        if board.player_turn["id"] == player["id"]:
+            highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
+                                   self.pos_y - self.highlight_border_thickness,
+                                   self.width + (2 * self.highlight_border_thickness),
+                                   self.height + (2 * self.highlight_border_thickness))
+            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle,
+                             self.highlight_border_thickness)
+
         if self.selected == True:
             highlight_rectangle = (self.pos_x - self.highlight_border_thickness,
                          self.pos_y - self.highlight_border_thickness,
                          self.width + (2*self.highlight_border_thickness),
                          self.height + (2*self.highlight_border_thickness))
-            pygame.draw.rect(board.game_display, self.highlight_border_colour, highlight_rectangle, self.highlight_border_thickness)
+            pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle, self.highlight_border_thickness)
+
 
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
         myfont = pygame.font.SysFont("Comic Sans MS", 20)
@@ -427,6 +442,7 @@ class Board():
         self.board_position_x = 0 + self.side_menu_left.menu_width
         self.board_position_y = 0
         self.stage = 1
+        self.player_turn =""
 
         # Side menu right
         self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
@@ -454,6 +470,8 @@ class Board():
 
         # mouse
         self.mouse_selected_node = ""
+        self.mouse_selected_launch_node = ""
+        self.mouse_selected_attack_node = ""
 
         pygame.display.update()
 
@@ -489,127 +507,34 @@ class Board():
 class PlayGame():
     def __init__(self, board):
         # side menu assistance variables
-        self.network_graph = {
-            "A": {"connections": ["B"],
-                  "coords": [520, 25]},
-            "B": {"connections": ["A", "C", "D", "E"],
-                  "coords": [525, 225]},
-            "C": {"connections": ["B", "F"],
-                  "coords": [371, 473]},
-            "D": {"connections": ["B", "E", "F", "G"],
-                  "coords": [505, 518]},
-            "E": {"connections": ["B", "D", "G"],
-                  "coords": [628, 459]},
-            "F": {"connections": ["C", "D", "H"],
-                  "coords": [414, 593]},
-            "G": {"connections": ["D", "E", "H", "I"],
-                  "coords": [613, 593]},
-            "H": {"connections": ["F", "G", "I"],
-                  "coords": [468, 704]},
-            "I": {"connections": ["G", "H", "J"],
-                  "coords": [620, 735]},
-            "J": {"connections": ["H", "I"],
-                  "coords": [492, 853]}}
+        self.network_graph = {}
+        self.current_player_data = {}
+        self.opposition_player_data = {}
 
         # Variables used to store player turns
         self.player1_turns = 0
         self.player2_turns = 0
 
-        # Varioables used for the change between players
-        self.current_player = "p1"
-        self.current_player_data = {}
-        self.current_player_no_of_territories = 0
-        # sets up dictionary for main game loop
-        # self.currentNode = 'A'
-
-        self.player1 = {
-            "shield": "Shield 5.fw.PNG",
-            "playerOccupied": ["A", "D", "E", "H", "I"],
-            "unallocated_troops": 0,
-            "troops_at_node": {}
-        }
-        # player 1 initial territory allocation
-        for node in self.player1["playerOccupied"]:
-            #self.player1[node] = len(self.network_graph[node]["connections"])
-            self.player1["troops_at_node"][node] = 1
-            self.player1["unallocated_troops"] = 10
-
-
-        self.player1_no_of_territories = 0
-        self.player2 = {
-            "shield": "Shield 2.fw.PNG",
-            "playerOccupied": ["B", "C", "F", "G", "J"],
-            "unallocated_troops": 0,
-            "troops_at_node": {}
-        }
-        # player 2 initial territory allocation
-        for node in self.player2["playerOccupied"]:
-            #self.player2[node] = len(self.network_graph[node]["connections"])
-            self.player2["troops_at_node"][node] = 1
-            self.player2["unallocated_troops"] = 10
-
-
-
-        self.player2_no_of_territories = 0
-        # print (self.player1["p1Occupied"])
-
-        ##        if self.curretnNode in self.player1["p1Occupied"]:
-        ##            print("this is a valid move")
         self.crashed = False
         self.board = board
         self.side_menu_left = board.side_menu_left
         self.side_menu_right = board.side_menu_right
 
-        # self.sideMenuAssistance()
+    def saveGame(self, game_state):
+        print('Save:', game_state)
+        with open('test_pickle.pkl', 'wb') as pickle_out:
+            pickle.dump(game_state, pickle_out)
 
-        self.loadBoardState(self.player1, self.player2)
-        self.playGame(self.current_player, board.stage)
+    def quitGame(self):
+        pygame.quit()
 
-
-
-                    # print (board.stage)
-                    # board.stage = board.stage + 1
-                    # board.side_menu_left.drawItems(board.game_display, board.stage)
-                    # pygame.display.update()
-
-        #             # for
-        #             # for button in
-        #             # print ("mouse", mouse)
-        #             # pygame.display.update()
-        #             for icon in board.icon_list:
-        #                 print(icon.x, icon.y)
-        #                 if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-        #                     print(icon.node, "node")
-        #                     self.board.game_display.blit(pygame.image.load(self.current_shield), (icon.x, icon.y))
-        #                     if icon.node in self.current_player_data["playerOccupied"]:
-        #                         pass
-        #                     else:
-        #                         self.current_player_data["playerOccupied"].extend(icon.node)
-        #                         print(self.current_player_data)
-        #
-        #                     iconFound = False
-        #                     pygame.display.update()
-        #                     break
-        #         else:
-        #             pass
-
-
-    def SaveGame(self):
-        pass
-
-    def LoadGame(self):
-        pass
-
-        pygame.display.update()
-
-
-    def allocationStage(self):
+    def allocationStage(self, game_state):
         #
         count = 0
-        print ("this is the allocation of your troops")
+        print ("this is the allocation of your troops", game_state)
         #implementing breadth first search for nodes around the users current nodes for troop allocation
         # Traversing the network graph to find neighbouring nodes
-        for current_node in self.current_player_data["playerOccupied"]:
+        for current_node in game_state["current_player"]["playerOccupied"]:
             #print("this is the node in the allocation stage", node)
             current_vertex_list = self.network_graph[current_node]
             #print (current_vertex_list)
@@ -618,9 +543,15 @@ class PlayGame():
         print ("the number of troopps that the player will receive is", count)
         NoOfTroops = count
 
-    def loadBoardState(self, current_player, opposition_player):
+    def loadBoardState(self, game_state):
         board.DisplayMap()
-        for player in [current_player, opposition_player]:
+        player1 = game_state["current_player"]
+        player2 = game_state["opposition_player"]
+        if game_state["current_player"]["id"] == "p2":
+            player1 = game_state["opposition_player"]
+            player2 = game_state["current_player"]
+
+        for player in [player1, player2]:
             for node in self.network_graph:
                 node_shape = NodeGraphic()  # instance of the Node graphics for rendering the shield, highlighting etc.
                 if node in player["playerOccupied"]:
@@ -629,14 +560,15 @@ class PlayGame():
                     node_shape.node_network_name = node
                     node_shape.selected = (node == self.board.mouse_selected_node)
                     node_shape.drawNode(board, player)
-                    board.side_menu_right.drawTroopAllocationArea(board.game_display, self.player1, self.player2)
+                    board.side_menu_right.drawTroopAllocationArea(board.game_display, player1, player2)
             pygame.display.update()
         pygame.display.update()
 
     def makeMove(self):
         pass
 
-    def attack(self):
+    def attack(self, game_state):
+        self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         print ("Executing Attack function")
         pass
 
@@ -644,25 +576,22 @@ class PlayGame():
         pass
 
 
-    def playGame(self, player, stage):
+    def playGame(self, game_state):
 
-        self.current_player = player
+        self.current_player_data = game_state["current_player"]
+        self.opposition_player_data = game_state["opposition_player"]
+        stage = game_state["stage"]
+        self.network_graph = game_state["network_graph"]
 
-        if self.current_player == "p1":
-            self.current_player_data = self.player1
-            self.opposition_player_data = self.player2
-            self.current_player_no_of_territories = self.player1_no_of_territories
-
-        else:
-            self.current_player_data = self.player2
-            self.opposition_player_data = self.player1
-            self.current_player_no_of_territories = self.player2_no_of_territories
+        board.player_turn = game_state["current_player"]
 
         if stage == 1:
-            self.allocationStage()
+            print("confirmed stage of allocate!", game_state)
+            self.allocationStage(game_state)
+            self.loadBoardState(game_state)
         elif stage == 2:
             print("confirmed stage of attack!")
-            self.attack()
+            self.attack(game_state)
 
         while not self.crashed:
             for event in pygame.event.get():
@@ -671,86 +600,132 @@ class PlayGame():
                     quit()
                     self.crashed = True
                 mouse = pygame.mouse.get_pos()
-                if board.stage == 1:
-                    if event.type == pygame.MOUSEBUTTONDOWN:
-                        if board.mouse_selected_node != "":
-                            # deselect the node if anywhere is clicked
-                            board.mouse_selected_node = ""
-                            self.loadBoardState(self.current_player_data, self.opposition_player_data)
-                        for icon in board.icon_list:
-                            if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-                                if icon.node not in self.current_player_data["playerOccupied"]:
-                                    board.mouse_selected_node = ""
-                                else:
-                                    if board.mouse_selected_node != icon.node:  # A different node has been selected
-                                        board.mouse_selected_node = icon.node
-                                        self.loadBoardState(self.current_player_data, self.opposition_player_data)
-                        btn_allocate_xpos = self.side_menu_left.x_pos_stage_allocate
-                        btn_allocate_width = self.side_menu_left.stage_button_width
-                        btn_stage_ypos = self.side_menu_left.y_pos_stage_menu
-                        btn_stage_height = self.side_menu_left.stage_height
-                        for button in getButtonState():
-                            if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
-                                print ('Confirm pressed in button', button, self.current_player, self.current_player_data)
-                                setButtonState("remove", button, None)  # remove the confirm
-                                # Proceed to next player or next stage
-                                if self.current_player == "p1":
-                                    self.playGame("p2", board.stage)
-                                else:
-                                    self.playGame("p1", board.stage + 1)
-                                    self.side_menu_left.drawItems(board.game_display, board.stage)
+                #######################
+                #######################
+                #######################
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if board.mouse_selected_node != "":
+                        # deselect the node if anywhere is clicked
+                        board.mouse_selected_node = ""
+                        self.loadBoardState(game_state)
+                    for icon in board.icon_list:
+                        if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
+                            if icon.node not in self.current_player_data["playerOccupied"]:
+                                board.mouse_selected_node = ""
+                            else:
+                                if board.mouse_selected_node != icon.node:  # A different node has been selected
+                                    board.mouse_selected_node = icon.node
 
-                        else:
-                            print("unable to allocate x", btn_allocate_xpos + btn_allocate_width , '<', mouse[0], '<',  btn_allocate_xpos)
-                            print("unable to allocate y", btn_stage_ypos + btn_stage_height, '<', mouse[1], '<', btn_stage_height)
+                                    self.loadBoardState(game_state)
 
-                    elif event.type == pygame.KEYDOWN:
-                        if board.mouse_selected_node:
-                            print("selected node: " + board.mouse_selected_node)
-                            if event.key == pygame.K_UP:
+                    for button in getButtonState():
+                        if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
+                            # Allocate
+                            if board.stage == 1:
+                                if button == ("confirm" + self.current_player_data["shield"]):
+                                    # Proceed to next player or next stage
+                                    if self.current_player_data["id"] == "p1":
+                                        game_state["opposition_player"] = self.current_player_data
+                                        game_state["current_player"] = self.opposition_player_data
+                                        self.playGame(game_state)
+                                    else:
+                                        game_state["stage"] = board.stage + 1
+                                        self.playGame(game_state)
+                            # Save Game
+                            if button == "save":
+                                self.saveGame(game_state)
+
+                            # Quit Game
+                            if button == "quit":
+                                self.quitGame()
+                    # Attack
+                    if board.stage == 2:
+                        if board.mouse_selected_launch_node == "" and board.mouse_selected_node != "":
+                            board.mouse_selected_launch_node = board.mouse_selected_node
+                            print ("Attacking from", board.mouse_selected_launch_node, board.mouse_selected_node)
+
+
+                elif event.type == pygame.KEYDOWN:
+                    if board.mouse_selected_node:
+                        print("selected node: " + board.mouse_selected_node)
+
+                        if event.key == pygame.K_UP:
+                            if board.stage == 1:
                                 if self.current_player_data["unallocated_troops"] > 0:
                                     self.current_player_data["unallocated_troops"] = self.current_player_data["unallocated_troops"] - 1
                                     self.current_player_data["troops_at_node"][board.mouse_selected_node] = self.current_player_data["troops_at_node"][board.mouse_selected_node] + 1
 
-                            elif event.key == pygame.K_DOWN:
+                        elif event.key == pygame.K_DOWN:
+                            if board.stage == 1:
                                 if self.current_player_data["troops_at_node"][board.mouse_selected_node] > 1:
                                     self.current_player_data["unallocated_troops"] = self.current_player_data[ "unallocated_troops"] + 1
                                     self.current_player_data["troops_at_node"][board.mouse_selected_node] = self.current_player_data["troops_at_node"][board.mouse_selected_node] - 1
-                            self.loadBoardState(self.current_player_data, self.opposition_player_data)
-                        else:
-                            print("no mouse selected node!" + board.mouse_selected_node)
-                elif board.stage == 2:
-                    print("Now proceeding to the next stage! ")
+                        self.loadBoardState(game_state)
+                    else:
+                        print("no mouse selected node!" + board.mouse_selected_node)
 
+def newGame(board):
+    network_graph = {
+        "A": {"connections": ["B"],
+              "coords": [520, 25]},
+        "B": {"connections": ["A", "C", "D", "E"],
+              "coords": [525, 225]},
+        "C": {"connections": ["B", "F"],
+              "coords": [371, 473]},
+        "D": {"connections": ["B", "E", "F", "G"],
+              "coords": [505, 518]},
+        "E": {"connections": ["B", "D", "G"],
+              "coords": [628, 459]},
+        "F": {"connections": ["C", "D", "H"],
+              "coords": [414, 593]},
+        "G": {"connections": ["D", "E", "H", "I"],
+              "coords": [613, 593]},
+        "H": {"connections": ["F", "G", "I"],
+              "coords": [468, 704]},
+        "I": {"connections": ["G", "H", "J"],
+              "coords": [620, 735]},
+        "J": {"connections": ["H", "I"],
+              "coords": [492, 853]}}
+    player1 = {
+        "id": "p1",
+        "shield": "Shield 5.fw.PNG",
+        "playerOccupied": ["A", "D", "E", "H", "I"],
+        "unallocated_troops": 0,
+        "troops_at_node": {}
+    }
+    # player 1 initial territory allocation
+    for node in player1["playerOccupied"]:
+        player1["troops_at_node"][node] = 1
+        player1["unallocated_troops"] = 1
 
+    player2 = {
+        "id": "p2",
+        "shield": "Shield 2.fw.PNG",
+        "playerOccupied": ["B", "C", "F", "G", "J"],
+        "unallocated_troops": 0,
+        "troops_at_node": {}
+    }
+    # player 2 initial territory allocation
+    for node in player2["playerOccupied"]:
+        player2["troops_at_node"][node] = 1
+        player2["unallocated_troops"] = 1
 
+    initial_game_state = {
+        "stage": board.stage,
+        "current_player": player1,
+        "opposition_player": player2,
+        "network_graph":  network_graph
+    }
+    board.player_turn = "p1"
+    play_game = PlayGame(board)
+    play_game.playGame(initial_game_state)
 
+def loadGame(board):
+    with open('test_pickle.pkl', 'rb') as pickle_in:
+        game_data = pickle.load(pickle_in)
+        play_game = PlayGame(board)
+        play_game.playGame(game_data)
 
-
-##    def play(self):
-##        while not self.crashed:
-##            for event in pygame.event.get():
-##                #print(event)
-##                if event.type == pygame.QUIT:
-##                    pygame.quit()
-##                    quit()
-##                    self.crashed = True
-##                mouse = pygame.mouse.get_pos()
-##
-##                if event.type == pygame.MOUSEBUTTONDOWN:
-##                    print ("mouse", mouse)
-##                    #pygame.display.update()
-##                    for icon in board.iconList:
-##                        print(icon.x, icon.y)
-##                        if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
-##                            print(icon.node, "node")
-##                            self.board.gameDisplay.blit(pygame.image.load(icon.shield), (icon.x, icon.y))
-##                            iconFound = False
-##                            pygame.display.update()
-##                            break
-##
-##                else:
-##                    pass
 
 if __name__ == "__main__":
 
@@ -790,11 +765,16 @@ if __name__ == "__main__":
                         button_found = True
                         # Menu option is loaded below
                         if button_number == 1:
+                            # NEW Game
                             pygame.quit()
                             board = Board()
                             play = PlayGame(board)
+                            newGame(board)
                         elif button_number == 2:
-                            ### need to add in a load game function
+                            # LOAD Game
+                            pygame.quit()
+                            board = Board()
+                            loadGame(board)
                             pass
                         elif button_number == 3:
                             pygame.quit()
