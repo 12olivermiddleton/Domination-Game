@@ -366,12 +366,13 @@ class TroopArea():
             board.game_display.blit(picture, sigil_rectangle)
 
         # # Confirm Button
-        btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
-        btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
-        btn_id = "confirm" + player["shield"]
-        if player["unallocated_troops"] == 0:
-            btn_confirm = PaperButton()
-            btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
+        if board.stage == 1:
+            btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
+            btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
+            btn_id = "confirm" + player["shield"]
+            if player["unallocated_troops"] == 0:
+                btn_confirm = PaperButton()
+                btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
 
 
 
@@ -381,6 +382,7 @@ class SideMenuRight():
         # Colours
         self.status_colour = Colour.white
         self.current_colour = Colour.red
+        self.initial_colour = Colour.darkGrey
 
         # Menu Container
         self.menu_xpos = menu_xpos
@@ -388,12 +390,15 @@ class SideMenuRight():
         self.menu_width = 450
         self.menu_height = menu_height
 
+        # Side Menu Right Title
+        self.menu_title_height = 60
+
         # Troop Area
         self.troop_area_background = "scroll compass map 30pc.jpg"
         troop_area_indent_from_left = 0
         self.troop_area_height = 300
         troop_area_vertical_gap = 60
-        troop_area_indent_from_top = 60
+        troop_area_indent_from_top = self.menu_title_height
         self.player_troop_banner_width = 100
         self.player_troop_banner_height = 100
         self.player1_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
@@ -406,17 +411,39 @@ class SideMenuRight():
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
-        stage_text = "Allocate troops"
-        if stage == 2:
-            stage_text = "Attack"
+        stage_text = ""
+        if stage == 1:
+            stage_text = "Allocate troops"
+        elif stage == 2:
+            stage_text = "Launch the Attack"
+        pygame.draw.rect(surface, self.initial_colour, (self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
-    def drawTroopAllocationArea(self, surface, player1_state, player2_state):
+    def drawTroopAllocationArea(self, board, player1_state, player2_state):
         player1_troop_area_backing = PaperTroopArea()
         player2_troop_area_backing = PaperTroopArea()
-        player1_troop_area_backing.drawArea(surface, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
-        player2_troop_area_backing.drawArea(surface, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
+        if board.stage == 1:
+            player1_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
+            player2_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
+        elif board.stage == 2:
+            troops_at_p1_node = ""
+            troops_at_p2_node = ""
+            if player1_state["selected_node"] != "":
+                troops_at_p1_node = player1_state["troops_at_node"][player1_state["selected_node"]]
+                if board.player_turn["id"] == player1_state["id"]:
+                    # TODO: highlight the player attacking in the side menu right.
+                    print("highlight green rect on p1")
+                else:
+                    print("highlight red rect on p1")
+            if player2_state["selected_node"] != "":
+                troops_at_p2_node = player2_state["troops_at_node"][player2_state["selected_node"]]
+                if board.player_turn["id"] == player2_state["id"]:
+                    print("highlight green rect on p2")
+                else:
+                    print("highlight red rect on p2")
+            player1_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, troops_at_p1_node)
+            player2_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, troops_at_p2_node)
         player1_troop_area = TroopArea()
         player2_troop_area = TroopArea()
         player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos, "Player One")
@@ -595,7 +622,7 @@ class PlayGame():
                     node_shape.pos_y = self.network_graph[node]["coords"][1]
                     node_shape.node_network_name = node
                     node_shape.drawNode(board, player)
-                    board.side_menu_right.drawTroopAllocationArea(board.game_display, player1, player2)
+                    board.side_menu_right.drawTroopAllocationArea(board, player1, player2)
             pygame.display.update()
         pygame.display.update()
 
@@ -619,6 +646,7 @@ class PlayGame():
 
     def attack(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
+        self.side_menu_right.drawItems(board.game_display, game_state["stage"])
         print ("Executing Attack function")
         pass
 
@@ -641,7 +669,7 @@ class PlayGame():
         elif board.stage == 2:
             print("confirmed stage of attack!")
             self.attack(game_state)
-
+        print('0')
         self.loadBoardState(game_state)
         while not self.crashed:
             for event in pygame.event.get():
@@ -667,6 +695,7 @@ class PlayGame():
                                             # and the enemy is reachable from the node
                                             print("Enemy selected", icon.node)
                                             board.mouse_selected_attack_node = icon.node
+                                            game_state["opposition_player"]["selected_node"] = icon.node
                                             game_state["opposition_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
                                             print(game_state["opposition_player"]["selected_node_banner"])
                                             self.loadBoardState(game_state)
@@ -674,6 +703,7 @@ class PlayGame():
                                         # the launch node was missing
                                         board.mouse_selected_node = ""
                                         board.mouse_selected_attack_node = ""
+                                        game_state["opposition_player"]["selected_node"] = ""
                                         game_state["opposition_player"]["selected_node_banner"] = ""
                                 else:
                                     # default stage behaviour is selecting enemy node cancels current node selection
@@ -687,7 +717,9 @@ class PlayGame():
                                     board.mouse_selected_node = icon.node
                                     if board.stage == 2:
                                         board.mouse_selected_launch_node = icon.node
+                                        game_state["current_player"]["selected_node"] = icon.node
                                         game_state["current_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
+                                        game_state["opposition_player"]["selected_node"] = ""
                                         game_state["opposition_player"]["selected_node_banner"] = ""
                                         board.mouse_selected_attack_node = ""
                                         board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
