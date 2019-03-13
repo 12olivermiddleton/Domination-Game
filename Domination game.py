@@ -24,6 +24,10 @@ class Colour():
     pink = pygame.Color(255, 200, 200)
     darkGrey = pygame.Color(23, 26, 37)
 
+class SigilBanner():
+    height= 100
+    width = 100
+
 
 class CustomFont():
     def __init__(self):
@@ -331,6 +335,10 @@ class TroopArea():
         self.troop_area_ypos = 0
         self.text_on_troop_area = Colour.black
 
+        ## Sigil
+        self.sigil_width = SigilBanner.width
+        self.sigil_height = SigilBanner.height
+
         # btn confirm to next stage
         self.btn_confirm_indent_from_left = 60
         self.btn_confirm_indent_from_bottom = 60
@@ -346,6 +354,17 @@ class TroopArea():
         self.troop_area_ypos = pos_y
         player_text = domination_font.menu_button.render(player_string, False, self.text_on_troop_area)
         board.game_display.blit(player_text, (self.troop_area_xpos, self.troop_area_ypos))
+
+        ## Sigil
+        if player["selected_node_banner"]:
+            sigil_xpos = pos_x
+            sigil_ypos = pos_y + (self.troop_area_height - self.sigil_height) / 2
+            picture = pygame.image.load(player["selected_node_banner"])
+            picture = pygame.transform.scale(picture, (self.sigil_width, self.sigil_height))
+            sigil_rectangle = picture.get_rect()
+            sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
+            board.game_display.blit(picture, sigil_rectangle)
+
         # # Confirm Button
         btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
         btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
@@ -375,10 +394,14 @@ class SideMenuRight():
         self.troop_area_height = 300
         troop_area_vertical_gap = 60
         troop_area_indent_from_top = 60
+        self.player_troop_banner_width = 100
+        self.player_troop_banner_height = 100
         self.player1_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
         self.player1_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
         self.player2_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
         self.player2_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + troop_area_vertical_gap
+        self.player2_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.player2_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + troop_area_vertical_gap
 
 
     def drawItems(self, surface, stage):
@@ -644,14 +667,19 @@ class PlayGame():
                                             # and the enemy is reachable from the node
                                             print("Enemy selected", icon.node)
                                             board.mouse_selected_attack_node = icon.node
+                                            game_state["opposition_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
+                                            print(game_state["opposition_player"]["selected_node_banner"])
                                             self.loadBoardState(game_state)
                                     else:
                                         # the launch node was missing
                                         board.mouse_selected_node = ""
                                         board.mouse_selected_attack_node = ""
+                                        game_state["opposition_player"]["selected_node_banner"] = ""
                                 else:
                                     # default stage behaviour is selecting enemy node cancels current node selection
                                     board.mouse_selected_node = ""
+                                    # game_state["current_player"]["selected_node_banner"] = ""
+                                    # game_state["opposition_player"]["selected_node_banner"] = ""
                             else:
                                 # A node of the current player was clicked on
                                 if board.mouse_selected_node != icon.node:
@@ -659,6 +687,8 @@ class PlayGame():
                                     board.mouse_selected_node = icon.node
                                     if board.stage == 2:
                                         board.mouse_selected_launch_node = icon.node
+                                        game_state["current_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
+                                        game_state["opposition_player"]["selected_node_banner"] = ""
                                         board.mouse_selected_attack_node = ""
                                         board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
 
@@ -727,31 +757,44 @@ def initialTroopDeployment(player):
 def newGame(board):
     network_graph = {
         "A": {"connections": ["B"],
-              "coords": [520, 25]},
+              "coords": [520, 25],
+              "banner": "House-Whitewalker-Main-Shield.png"},
         "B": {"connections": ["A", "C", "D", "E"],
-              "coords": [525, 225]},
+              "coords": [525, 225],
+              "banner": "House-Stark-Main-Shield.png"},
         "C": {"connections": ["B", "F"],
-              "coords": [371, 473]},
+              "coords": [371, 473],
+              "banner": "House-Greyjoy-Main-Shield.png"},
         "D": {"connections": ["B", "E", "F", "G"],
-              "coords": [505, 518]},
+              "coords": [505, 518],
+              "banner": "House-Tully-Main-Shield.png"},
         "E": {"connections": ["B", "D", "G"],
-              "coords": [628, 459]},
+              "coords": [628, 459],
+              "banner": "House-Arryn-Main-Shield.png"},
         "F": {"connections": ["C", "D", "H"],
-              "coords": [414, 593]},
+              "coords": [414, 593],
+              "banner": "House-Lannister-Main-Shield.png"},
         "G": {"connections": ["D", "E", "H", "I"],
-              "coords": [613, 593]},
+              "coords": [613, 593],
+              "banner": "House-Hoare-Main-Shield.png"},
         "H": {"connections": ["F", "G", "I"],
-              "coords": [468, 704]},
+              "coords": [468, 704],
+              "banner": "House-Tyrell-Main-Shield.png"},
         "I": {"connections": ["G", "H", "J"],
-              "coords": [620, 735]},
+              "coords": [620, 735],
+              "banner": "House-Durrandon-Main-Shield.png"},
         "J": {"connections": ["H", "I"],
-              "coords": [492, 853]}}
+              "coords": [492, 853],
+              "banner": "House-Main-Shield.png"}}
     player1 = {
         "id": "p1",
+        "display_name": "Player One",
         "shield": "Shield 5.fw.PNG",
         "playerOccupied": ["A", "D", "E", "H", "I"],
         "unallocated_troops": 0,
-        "troops_at_node": {}
+        "troops_at_node": {},
+        "selected_node": "",
+        "selected_node_banner": ""
     }
     # player 1 initial territory allocation
     for node in player1["playerOccupied"]:
@@ -760,10 +803,13 @@ def newGame(board):
 
     player2 = {
         "id": "p2",
+        "display_name": "Player Two",
         "shield": "Shield 2.fw.PNG",
         "playerOccupied": ["B", "C", "F", "G", "J"],
         "unallocated_troops": 0,
-        "troops_at_node": {}
+        "troops_at_node": {},
+        "selected_node": "",
+        "selected_node_banner": ""
     }
     # player 2 initial territory allocation
     for node in player2["playerOccupied"]:
