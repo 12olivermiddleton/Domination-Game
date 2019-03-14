@@ -25,8 +25,8 @@ class Colour():
     darkGrey = pygame.Color(23, 26, 37)
 
 class SigilBanner():
-    height= 100
-    width = 100
+    height= 50
+    width = 45
 
 
 class CustomFont():
@@ -325,6 +325,8 @@ class SideMenuLeft():
 
 class TroopArea():
     def __init__(self):
+        self.domination_font = CustomFont()
+
         # Player Troop area
         self.troop_area_indent_from_left = 0
         self.troop_area_indent_from_top = 60
@@ -333,10 +335,15 @@ class TroopArea():
         self.troop_area_xpos = 0
         self.troop_area_ypos = 0
         self.text_on_troop_area = Colour.black
+        self.shield_square_height = self.domination_font.menu_button.get_height()
+        self.shield_square_width = self.shield_square_height
 
         ## Sigil
         self.sigil_width = SigilBanner.width
         self.sigil_height = SigilBanner.height
+        self.sigil_spacer = 10  # gap between army stack
+        self.army_index_new_row = 0  # set to zero to start army drawing a new row
+        self.army_index_row = 0  # track the row to draw the troops on
 
         # btn confirm to next stage
         self.btn_confirm_indent_from_left = 60
@@ -346,31 +353,58 @@ class TroopArea():
         self.btn_confirm_height = 75
 
     def drawTroopArea(self, board, player, pos_x, pos_y):
-        domination_font = CustomFont()
         self.troop_area_width = board.side_menu_right.menu_width
         self.troop_area_xpos = pos_x
         self.troop_area_ypos = pos_y
-        shield_square_height = domination_font.menu_button.get_height()
-        shield_square_width = shield_square_height
-        picture = pygame.image.load(player["shield"])
-        picture = pygame.transform.scale(picture, (shield_square_width , shield_square_height))
-        sigil_rectangle = picture.get_rect()
-        sigil_rectangle = sigil_rectangle.move(self.troop_area_xpos, self.troop_area_ypos)
-        board.game_display.blit(picture, sigil_rectangle)
-        player_text = domination_font.menu_button.render(player["display_name"], False, self.text_on_troop_area)
-        board.game_display.blit(player_text, (self.troop_area_xpos + shield_square_width, self.troop_area_ypos))
+        players_shield_img = pygame.image.load(player["shield"])
+        players_shield_img = pygame.transform.scale(players_shield_img, (self.shield_square_width , self.shield_square_height))
+        shield_rectangle = players_shield_img.get_rect()
+        shield_rectangle = shield_rectangle.move(self.troop_area_xpos, self.troop_area_ypos)
+        board.game_display.blit(players_shield_img, shield_rectangle)
+        player_text = self.domination_font.menu_button.render(player["display_name"], False, self.text_on_troop_area)
+        board.game_display.blit(player_text, (self.troop_area_xpos + self.shield_square_width, self.troop_area_ypos))
 
-        ## Sigil
-        if player["selected_node_banner"]:
-            sigil_xpos = pos_x
-            sigil_ypos = pos_y + (self.troop_area_height - self.sigil_height) / 2
-            picture = pygame.image.load(player["selected_node_banner"])
-            picture = pygame.transform.scale(picture, (self.sigil_width, self.sigil_height))
-            sigil_rectangle = picture.get_rect()
-            sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
-            board.game_display.blit(picture, sigil_rectangle)
+        ## Troop Stack
+        if player["selected_node"] != "":
+            if board.stage == 2:
+                armies_at_this_node = player["troops_at_node"][player["selected_node"]]
+                army_count_text_size = round(self.sigil_height / 1.5)
+                army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
+                max_renderable_armies = 32
+                army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 30 armies
+                army_count_display = str(armies_at_this_node)
 
-        # # Confirm Button
+                players_launch_army_img = pygame.image.load(player["selected_node_banner"])
+                players_launch_army_img = pygame.transform.scale(players_launch_army_img, (self.sigil_width, self.sigil_height))
+                sigil_xpos_spacer = self.sigil_width + self.sigil_spacer
+                sigil_ypos_spacer = self.sigil_height + self.sigil_spacer
+
+                for army_index in range(army_display_spaces):
+                    ## Stack the Sigils
+                    if player["selected_node_banner"]:
+                        # spaced along x
+                        sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
+                        sigil_ypos = pos_y + self.shield_square_height + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
+                        # rowed down y
+                        if sigil_xpos + 2 * sigil_xpos_spacer > self.troop_area_xpos + self.troop_area_width:
+                            self.army_index_new_row = army_index
+                            self.army_index_row = self.army_index_row + 1
+                            sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
+                            sigil_ypos = pos_y + self.shield_square_height + + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
+
+                        # dray army item
+                        sigil_rectangle = players_launch_army_img.get_rect()
+                        sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
+                        board.game_display.blit(players_launch_army_img, sigil_rectangle)
+
+                        # display the army size
+                        if army_index == army_display_spaces - 1:
+                            if armies_at_this_node > max_renderable_armies:
+                                army_count_display = ".." + army_count_display  ## > max renderable
+                            army_count_surface = army_count_font.render(army_count_display, False, Colour.black)
+                            board.game_display.blit(army_count_surface, (sigil_xpos + sigil_xpos_spacer, sigil_ypos))
+
+        ## Confirm Allocate Button
         if board.stage == 1:
             btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
             btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
@@ -378,7 +412,6 @@ class TroopArea():
             if player["unallocated_troops"] == 0:
                 btn_confirm = PaperButton()
                 btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
-
 
 
 class SideMenuRight():
@@ -392,7 +425,7 @@ class SideMenuRight():
         # Menu Container
         self.menu_xpos = menu_xpos
         self.menu_ypos = menu_ypos
-        self.menu_width = 450
+        self.menu_width = 500
         self.menu_height = menu_height
 
         # Side Menu Right Title
@@ -402,53 +435,54 @@ class SideMenuRight():
         self.troop_area_background = "scroll compass map 30pc.jpg"
         troop_area_indent_from_left = 0
         self.troop_area_height = 300
-        troop_area_vertical_gap = 60
         troop_area_indent_from_top = self.menu_title_height
         self.player_troop_banner_width = 100
         self.player_troop_banner_height = 100
+        self.troop_area_inbetween_height = 60
+
         self.player1_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
         self.player1_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
+        self.troop_area_gap_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.troop_area_gap_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height
         self.player2_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.player2_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + troop_area_vertical_gap
+        self.player2_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_inbetween_height
         self.player2_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.player2_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + troop_area_vertical_gap
-
+        self.player2_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_inbetween_height
+        self.btn_attack_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_inbetween_height
+        self.btn_attack_height = 60
+        self.btn_attack_background = "empty aged paper 30pc.jpg"
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
         stage_text = ""
+        pygame.draw.rect(surface, self.initial_colour,(self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
         if stage == 1:
             stage_text = "Allocate troops"
         elif stage == 2:
             stage_text = "Prepare the Attack"
-        pygame.draw.rect(surface, self.initial_colour, (self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
+            inbetween_text1 = domination_font.menu_heading.render("Vs", False, Colour.white)
+            surface.blit(inbetween_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text1), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_inbetween_height, inbetween_text1)))
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
     def drawTroopAllocationArea(self, board, player1_state, player2_state):
         player1_troop_area_backing = PaperTroopArea()
         player2_troop_area_backing = PaperTroopArea()
+        backing_text_p1 = ""
+        backing_text_p2 = ""
         if board.stage == 1:
-            player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
-            player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
+            backing_text_p1 = player1_state["unallocated_troops"]
+            backing_text_p2 = player2_state["unallocated_troops"]
         elif board.stage == 2:
-            troops_at_p1_node = ""
-            troops_at_p2_node = ""
-            if player1_state["selected_node"] != "":
-                troops_at_p1_node = player1_state["troops_at_node"][player1_state["selected_node"]]
-                if board.player_turn["id"] == player1_state["id"]:
-                    # TODO: highlight the player attacking in the side menu right.
-                    print("highlight green rect on p1")
-                else:
-                    print("highlight red rect on p1")
-            if player2_state["selected_node"] != "":
-                troops_at_p2_node = player2_state["troops_at_node"][player2_state["selected_node"]]
-                if board.player_turn["id"] == player2_state["id"]:
-                    print("highlight green rect on p2")
-                else:
-                    print("highlight red rect on p2")
-            player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, troops_at_p1_node)
-            player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, troops_at_p2_node)
+            if player1_state["selected_node"] != "" and player2_state["selected_node"] != "":
+                ## Confirm Attack Button
+                btn_attack = PaperButton()
+                btn_id = "attack"
+                btn_attack.drawButton(board.game_display, self.btn_attack_background, self.menu_width, self.btn_attack_height, self.btn_attack_xpos, self.btn_attack_ypos, "Attack", btn_id)
+
+        player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, backing_text_p1)
+        player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, backing_text_p2)
         player1_troop_area = TroopArea()
         player2_troop_area = TroopArea()
         player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos)
@@ -493,8 +527,7 @@ class NodeGraphic():
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
         myfont = pygame.font.SysFont("Comic Sans MS", 20)
         text_surface = myfont.render(str(player["troops_at_node"][self.node_network_name]), False, Colour.white)
-        board.game_display.blit(text_surface, (
-        centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
+        board.game_display.blit(text_surface, (centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
 
 class Board():
     def __init__(self):
@@ -758,8 +791,6 @@ class PlayGame():
                             if button == "quit":
                                 self.quitGame()
 
-
-
                 elif event.type == pygame.KEYDOWN:
                     if board.mouse_selected_node:
                         print("selected node: " + board.mouse_selected_node)
@@ -822,7 +853,7 @@ def newGame(board):
               "banner": "House-Durrandon-Main-Shield.png"},
         "J": {"connections": ["H", "I"],
               "coords": [492, 853],
-              "banner": "House-Main-Shield.png"}}
+              "banner": "House-Martell-Main-Shield.png"}}
     player1 = {
         "id": "p1",
         "display_name": "Player One",
@@ -837,7 +868,7 @@ def newGame(board):
     # player 1 initial territory allocation
     for node in player1["playerOccupied"]:
         player1["troops_at_node"][node] = 1
-        player1["unallocated_troops"] = 10
+        player1["unallocated_troops"] = 125
 
     player2 = {
         "id": "p2",
@@ -853,7 +884,7 @@ def newGame(board):
     # player 2 initial territory allocation
     for node in player2["playerOccupied"]:
         player2["troops_at_node"][node] = 1
-        player2["unallocated_troops"] = 10
+        player2["unallocated_troops"] = 130
 
     initial_game_state = {
         "stage": board.stage,
