@@ -325,8 +325,7 @@ class SideMenuLeft():
 
 class TroopArea():
     def __init__(self):
-        # Player 1 Troop area
-        self.troop_area_background = "scroll compass map 30pc.jpg"
+        # Player Troop area
         self.troop_area_indent_from_left = 0
         self.troop_area_indent_from_top = 60
         self.troop_area_width = 0
@@ -346,14 +345,20 @@ class TroopArea():
         self.btn_confirm_width = 200
         self.btn_confirm_height = 75
 
-
-    def drawTroopArea(self, board, player, pos_x, pos_y, player_string):
+    def drawTroopArea(self, board, player, pos_x, pos_y):
         domination_font = CustomFont()
         self.troop_area_width = board.side_menu_right.menu_width
         self.troop_area_xpos = pos_x
         self.troop_area_ypos = pos_y
-        player_text = domination_font.menu_button.render(player_string, False, self.text_on_troop_area)
-        board.game_display.blit(player_text, (self.troop_area_xpos, self.troop_area_ypos))
+        shield_square_height = domination_font.menu_button.get_height()
+        shield_square_width = shield_square_height
+        picture = pygame.image.load(player["shield"])
+        picture = pygame.transform.scale(picture, (shield_square_width , shield_square_height))
+        sigil_rectangle = picture.get_rect()
+        sigil_rectangle = sigil_rectangle.move(self.troop_area_xpos, self.troop_area_ypos)
+        board.game_display.blit(picture, sigil_rectangle)
+        player_text = domination_font.menu_button.render(player["display_name"], False, self.text_on_troop_area)
+        board.game_display.blit(player_text, (self.troop_area_xpos + shield_square_width, self.troop_area_ypos))
 
         ## Sigil
         if player["selected_node_banner"]:
@@ -415,7 +420,7 @@ class SideMenuRight():
         if stage == 1:
             stage_text = "Allocate troops"
         elif stage == 2:
-            stage_text = "Launch the Attack"
+            stage_text = "Prepare the Attack"
         pygame.draw.rect(surface, self.initial_colour, (self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
@@ -424,8 +429,8 @@ class SideMenuRight():
         player1_troop_area_backing = PaperTroopArea()
         player2_troop_area_backing = PaperTroopArea()
         if board.stage == 1:
-            player1_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
-            player2_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
+            player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, player1_state["unallocated_troops"])
+            player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, player2_state["unallocated_troops"])
         elif board.stage == 2:
             troops_at_p1_node = ""
             troops_at_p2_node = ""
@@ -442,12 +447,12 @@ class SideMenuRight():
                     print("highlight green rect on p2")
                 else:
                     print("highlight red rect on p2")
-            player1_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, troops_at_p1_node)
-            player2_troop_area_backing.drawArea(board.game_display, self.troop_area_background, self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, troops_at_p2_node)
+            player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, troops_at_p1_node)
+            player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, troops_at_p2_node)
         player1_troop_area = TroopArea()
         player2_troop_area = TroopArea()
-        player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos, "Player One")
-        player2_troop_area.drawTroopArea(board, player2_state, self.player2_troop_area_xpos, self.player2_troop_area_ypos, "Player Two")
+        player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos)
+        player2_troop_area.drawTroopArea(board, player2_state, self.player2_troop_area_xpos, self.player2_troop_area_ypos)
 
 class NodeGraphic():
     def __init__(self):
@@ -826,7 +831,8 @@ def newGame(board):
         "unallocated_troops": 0,
         "troops_at_node": {},
         "selected_node": "",
-        "selected_node_banner": ""
+        "selected_node_banner": "",
+        "troop_area_background": "scroll compass map 30pc.jpg"
     }
     # player 1 initial territory allocation
     for node in player1["playerOccupied"]:
@@ -841,7 +847,8 @@ def newGame(board):
         "unallocated_troops": 0,
         "troops_at_node": {},
         "selected_node": "",
-        "selected_node_banner": ""
+        "selected_node_banner": "",
+        "troop_area_background": "background grassy 30pc.jpg"
     }
     # player 2 initial territory allocation
     for node in player2["playerOccupied"]:
