@@ -61,6 +61,7 @@ class Menu():
         text_pos_x = 130
         button_text_no = 0
 
+        # An initial array of identical buttons
         for i in range(3):
             button_text_no = button_text_no + 1
             text_pos_y = y + 20
@@ -217,7 +218,7 @@ class PaperButton():
         btn_label_x = centreJustifyButton(self.button_rectangle.x, self.button_rectangle.width, btn_label)
         btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
         surface.blit(btn_label, (btn_label_x, btn_label_y))
-        setButtonState("add", btn_id, self.button_rectangle)
+        setButtonState("add", btn_id, self.button_rectangle)  #used to add and remove buttons from view
 
 class PaperTroopArea():
     def __init__(self):
@@ -833,7 +834,7 @@ def newGame(board):
         "C": {"connections": ["B", "F"],
               "coords": [371, 473],
               "banner": "House-Greyjoy-Main-Shield.png"},
-        "D": {"connections": ["B", "E", "F", "G"],
+        "D": {"connections": ["B", "E", "F", "G", "C"],
               "coords": [505, 518],
               "banner": "House-Tully-Main-Shield.png"},
         "E": {"connections": ["B", "D", "G"],
@@ -845,7 +846,7 @@ def newGame(board):
         "G": {"connections": ["D", "E", "H", "I"],
               "coords": [613, 593],
               "banner": "House-Hoare-Main-Shield.png"},
-        "H": {"connections": ["F", "G", "I"],
+        "H": {"connections": ["F", "G", "I", "J"],
               "coords": [468, 704],
               "banner": "House-Tyrell-Main-Shield.png"},
         "I": {"connections": ["G", "H", "J"],
