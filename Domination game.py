@@ -138,7 +138,7 @@ class Icons():
                   "coords": [414, 593]},
             "G": {"connections": ["D", "E", "H", "I"],
                   "coords": [613, 593]},
-            "H": {"connections": ["F", "G", "I"],
+            "H": {"connections": ["F", "G", "I", "J"],
                   "coords": [468, 704]},
             "I": {"connections": ["G", "H", "J"],
                   "coords": [620, 735]},
@@ -622,6 +622,8 @@ class PlayGame():
         self.side_menu_left = board.side_menu_left
         self.side_menu_right = board.side_menu_right
 
+
+
     def saveGame(self, game_state):
         print('Save:', game_state)
         with open('test_pickle.pkl', 'wb') as pickle_out:
@@ -678,15 +680,69 @@ class PlayGame():
             if neighbour in self.opposition_player_data["playerOccupied"]:
                 enemy_neighbours.append(neighbour)
 
-        print ("the node", node )
-        print ("the neighbours", neighbours)
+        print("the node", node )
+        print("the neighbours", neighbours)
         print("the neighbours that are enemies", enemy_neighbours)
         return enemy_neighbours
+
+    def fight(self):
+        # need player 1 vs player 2
+        # need to find selected nodes
+        # get number of troops on each node
+        # randomly work out which army wins
+
+        # get army sizes
+        attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
+        defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
+        print(attacking_army_size, defending_army_size)
+
+        # dice roll generator
+        def getDiceRollsFor(army_size):
+            dice_array = []
+            for i in range(army_size):
+                dice_number = random.randint(1,10)
+                dice_array.append(dice_number)
+            return dice_array
+        # runs dice roll generator
+        # attacking_dice_rolls = getDiceRollsFor(attacking_army_size)
+        # defending_dice_rolls = getDiceRollsFor(defending_army_size)
+
+
+
+        # compare dice roll arrays
+        def compareDiceRolls(attacking_size, defending_size):
+            attacking_dice_rolls = getDiceRollsFor(attacking_size)
+            defending_dice_rolls = getDiceRollsFor(defending_size)
+
+            attacking_survivors_size = 0
+            defending_survivors_size = 0
+
+            for battle in range((min(attacking_size, defending_size) - 1)):
+                if attacking_dice_rolls[battle] > defending_dice_rolls[battle]:
+                    attacking_survivors_size = attacking_survivors_size + 1
+                else:
+                    defending_survivors_size = defending_survivors_size + 1
+            return attacking_survivors_size, defending_survivors_size
+
+        finished_fighting = False
+        # recursive loop of fightinh
+        while not finished_fighting:
+            attacking_army_size, defending_army_size = compareDiceRolls(attacking_army_size, defending_army_size)
+            print('while', attacking_army_size, defending_army_size)
+            if attacking_army_size == 0 or defending_army_size == 0:
+                finished_fighting = True
+
+
+        # print(attacking_survivors_size, defending_survivors_size)
+        # print(attacking_dice_rolls)
+        # print(defending_dice_rolls)
+        print(self.current_player_data)
+        print(self.opposition_player_data)
 
     def attack(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         self.side_menu_right.drawItems(board.game_display, game_state["stage"])
-        print ("Executing Attack function")
+        print("Executing Attack function")
         pass
 
     def fortify(self):
@@ -784,6 +840,11 @@ class PlayGame():
                                     else:
                                         game_state["stage"] = board.stage + 1
                                         self.playGame(game_state)
+
+                            # Attack
+                            if board.stage == 2:
+                                if button == "attack":
+                                    self.fight()
                             # Save Game
                             if button == "save":
                                 self.saveGame(game_state)
