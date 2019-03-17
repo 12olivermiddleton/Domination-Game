@@ -464,6 +464,7 @@ class SideMenuRight():
             stage_text = "Prepare the Attack"
             inbetween_text1 = domination_font.menu_heading.render("Vs", False, Colour.white)
             surface.blit(inbetween_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text1), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_inbetween_height, inbetween_text1)))
+
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
@@ -481,6 +482,9 @@ class SideMenuRight():
                 btn_attack = PaperButton()
                 btn_id = "attack"
                 btn_attack.drawButton(board.game_display, self.btn_attack_background, self.menu_width, self.btn_attack_height, self.btn_attack_xpos, self.btn_attack_ypos, "Attack", btn_id)
+            else:
+                # Redraw self to remove "attack" button
+                self.drawItems(board.game_display, board.stage)
 
         player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, backing_text_p1)
         player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, backing_text_p2)
@@ -800,6 +804,7 @@ class PlayGame():
                                         board.mouse_selected_attack_node = ""
                                         game_state["opposition_player"]["selected_node"] = ""
                                         game_state["opposition_player"]["selected_node_banner"] = ""
+                                        self.loadBoardState(game_state)
                                 else:
                                     # default stage behaviour is selecting enemy node cancels current node selection
                                     board.mouse_selected_node = ""
