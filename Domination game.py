@@ -145,11 +145,6 @@ class Icons():
             "J": {"connections": ["H", "I"],
                   "coords": [492, 853]}}
         print(*self.network_graph["B"])
-        if self.user_node in self.network_graph[self.prior_node]:
-            print("I am a genius!!!")
-        else:
-            print("that was a massive fail")
-
 
 class Icon(Graphic):
     def __init__(self, colour, x, y, node, shield):
@@ -689,12 +684,11 @@ class PlayGame():
         print("the neighbours that are enemies", enemy_neighbours)
         return enemy_neighbours
 
-    def fight(self):
+    def fight(self, game_state):
         # need player 1 vs player 2
         # need to find selected nodes
         # get number of troops on each node
         # randomly work out which army wins
-
         # get army sizes
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
         defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
@@ -704,42 +698,56 @@ class PlayGame():
         def getDiceRollsFor(army_size):
             dice_array = []
             for i in range(army_size):
-                dice_number = random.randint(1,10)
+                dice_number = random.randint(1,100)
                 dice_array.append(dice_number)
             return dice_array
-        # runs dice roll generator
-        # attacking_dice_rolls = getDiceRollsFor(attacking_army_size)
-        # defending_dice_rolls = getDiceRollsFor(defending_army_size)
-
-
 
         # compare dice roll arrays
         def compareDiceRolls(attacking_size, defending_size):
             attacking_dice_rolls = getDiceRollsFor(attacking_size)
             defending_dice_rolls = getDiceRollsFor(defending_size)
 
-            attacking_survivors_size = 0
-            defending_survivors_size = 0
-
-            for battle in range((min(attacking_size, defending_size) - 1)):
-                if attacking_dice_rolls[battle] > defending_dice_rolls[battle]:
-                    attacking_survivors_size = attacking_survivors_size + 1
+            for battle in range((min(attacking_size, defending_size))):
+                if attacking_dice_rolls[battle] >= defending_dice_rolls[battle]:
+                    defending_size = defending_size - 1
                 else:
-                    defending_survivors_size = defending_survivors_size + 1
-            return attacking_survivors_size, defending_survivors_size
+                    attacking_size = attacking_size - 1
+                if attacking_size <= 2 or defending_size == 0:
+                    break
+
+            return attacking_size, defending_size
 
         finished_fighting = False
-        # recursive loop of fightinh
+        # recursive loop of fighting
         while not finished_fighting:
-            attacking_army_size, defending_army_size = compareDiceRolls(attacking_army_size, defending_army_size)
-            print('while', attacking_army_size, defending_army_size)
-            if attacking_army_size == 0 or defending_army_size == 0:
+            # spot the defeat conditions
+            if (attacking_army_size == 2 and defending_army_size < attacking_army_size) or defending_army_size == 0:
                 finished_fighting = True
+            elif attacking_army_size == 1 and defending_army_size > attacking_army_size:
+                finished_fighting = True
+            else:
+                # nobody defeated, roll dice again (recursion)
+                attacking_army_size, defending_army_size = compareDiceRolls(attacking_army_size, defending_army_size)
+
+        # set result of battle to update display
+        if attacking_army_size > defending_army_size:
+            self.current_player_data["playerOccupied"].append(self.opposition_player_data["selected_node"])
+            self.opposition_player_data["playerOccupied"].remove(self.opposition_player_data["selected_node"])
+            self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = attacking_army_size - 1
+            self.current_player_data["troops_at_node"][self.opposition_player_data["selected_node"]] = 1
+            del self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
+            print(self.current_player_data)
+            print(self.opposition_player_data)
+
+        self.current_player_data["selected_node"] = ""
+        self.current_player_data["selected_node_banner"] = ""
+        self.opposition_player_data["selected_node"] = ""
+        self.opposition_player_data["selected_node_banner"] = ""
+        game_state["current_player"] = self.current_player_data
+        game_state["opposition_player"] = self.opposition_player_data
 
 
-        # print(attacking_survivors_size, defending_survivors_size)
-        # print(attacking_dice_rolls)
-        # print(defending_dice_rolls)
+        self.loadBoardState(game_state)
         print(self.current_player_data)
         print(self.opposition_player_data)
 
@@ -751,7 +759,6 @@ class PlayGame():
 
     def fortify(self):
         pass
-
 
     def playGame(self, game_state):
 
@@ -849,7 +856,7 @@ class PlayGame():
                             # Attack
                             if board.stage == 2:
                                 if button == "attack":
-                                    self.fight()
+                                    self.fight(game_state)
                             # Save Game
                             if button == "save":
                                 self.saveGame(game_state)
