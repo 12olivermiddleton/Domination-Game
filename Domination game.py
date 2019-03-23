@@ -718,7 +718,6 @@ class PlayGame():
             return attacking_size, defending_size
 
         finished_fighting = False
-        # recursive loop of fighting
         while not finished_fighting:
             # spot the defeat conditions
             if (attacking_army_size == 2 and defending_army_size < attacking_army_size) or defending_army_size == 0:
@@ -739,13 +738,16 @@ class PlayGame():
             print(self.current_player_data)
             print(self.opposition_player_data)
 
+        else:
+            self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = 1
+            self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]] = defending_army_size
+
         self.current_player_data["selected_node"] = ""
         self.current_player_data["selected_node_banner"] = ""
         self.opposition_player_data["selected_node"] = ""
         self.opposition_player_data["selected_node_banner"] = ""
         game_state["current_player"] = self.current_player_data
         game_state["opposition_player"] = self.opposition_player_data
-
 
         self.loadBoardState(game_state)
         print(self.current_player_data)
@@ -837,7 +839,7 @@ class PlayGame():
                                     pass
                         else:
                             # mouse clicked away from any node
-                            pass
+                            print ("here")
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
