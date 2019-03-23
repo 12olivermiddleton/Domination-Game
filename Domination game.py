@@ -28,11 +28,124 @@ class SigilBanner():
     height= 50
     width = 45
 
+theme_got = {
+    "id": "theme_got",
+    "font": "./theme_got/MyDominationFont.ttf",
+    "map_image": "./theme_got/GOT map 2.JPG",
+    "map_width": 460,
+    "map_height": 950,
+    "button_background": "./theme_got/empty aged paper 30pc.jpg",
+    "shield_p1": "./theme_got/Shield 5.fw.PNG",
+    "shield_p2": "./theme_got/Shield 2.fw.PNG",
+    "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
+    "troop_area_image_p2": "./theme_got/background grassy 30pc.jpg",
+    "network_graph": {
+        "A": {"connections": ["B"],
+              "coords": [520, 25],
+              "banner": "./theme_got/House-Whitewalker-Main-Shield.png"},
+        "B": {"connections": ["A", "C", "D", "E"],
+              "coords": [525, 225],
+              "banner": "./theme_got/House-Stark-Main-Shield.png"},
+        "C": {"connections": ["B", "F"],
+              "coords": [371, 473],
+              "banner": "./theme_got/House-Greyjoy-Main-Shield.png"},
+        "D": {"connections": ["B", "E", "F", "G", "C"],
+              "coords": [505, 518],
+              "banner": "./theme_got/House-Tully-Main-Shield.png"},
+        "E": {"connections": ["B", "D", "G"],
+              "coords": [628, 459],
+              "banner": "./theme_got/House-Arryn-Main-Shield.png"},
+        "F": {"connections": ["C", "D", "H"],
+              "coords": [414, 593],
+              "banner": "./theme_got/House-Lannister-Main-Shield.png"},
+        "G": {"connections": ["D", "E", "H", "I"],
+              "coords": [613, 593],
+              "banner": "./theme_got/House-Hoare-Main-Shield.png"},
+        "H": {"connections": ["F", "G", "I", "J"],
+              "coords": [468, 704],
+              "banner": "./theme_got/House-Tyrell-Main-Shield.png"},
+        "I": {"connections": ["G", "H", "J"],
+              "coords": [620, 735],
+              "banner": "./theme_got/House-Durrandon-Main-Shield.png"},
+        "J": {"connections": ["H", "I"],
+              "coords": [492, 853],
+              "banner": "./theme_got/House-Martell-Main-Shield.png"}
+    },
+    "p1_occupied": ["A", "D", "E", "H", "I"],
+    "p2_occupied": ["B", "C", "F", "G", "J"]
+}
+# theme_space = {
+#     "id": "theme_space",
+#     "font": "./theme_space/Deadspace.ttf",
+#     "map_image": "./theme_space/Space map.JPG",
+#     "map_width": 862,
+#     "map_height": 1019,
+#     "button_background": "./theme_space/orange_paper.jpg",
+#     "shield_p1": "./theme_space/Shield 2.fw.PNG",
+#     "shield_p2": "./theme_space/Shield 5.fw.PNG",
+#     "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
+#     "troop_area_image_p2": "./theme_got/background grassy 30pc.jpg",
+#     "network_graph": {
+#         "A": {"connections": ["B"],
+#               "coords": [414, 135],
+#               "banner": "./theme_space/alien 1.png"},
+#         "B": {"connections": ["A", "C", "L"],
+#               "coords": [473, 204],
+#               "banner": "./theme_space/alien 2.png"},
+#         "C": {"connections": ["B", "D"],
+#               "coords": [666, 105],
+#               "banner": "./theme_space/alien 3.png"},
+#         "D": {"connections": ["C", "F", "J"],
+#               "coords": [756, 247],
+#               "banner": "./theme_space/alien 4.png"},
+#         "E": {"connections": ["F"],
+#               "coords": [1044, 88],
+#               "banner": "./theme_space/alien 5.png"},
+#         "F": {"connections": ["E", "G"],
+#               "coords": [1095, 155],
+#               "banner": "./theme_space/alien 6.png"},
+#         "G": {"connections": ["F", "D", "H"],
+#               "coords": [1105, 219],
+#               "banner": "./theme_space/alien 7.png"},
+#         "H": {"connections": ["G", "I"],
+#               "coords": [1087, 276],
+#               "banner": "./theme_space/alien 8.png"},
+#         "I": {"connections": ["H", "J"],
+#               "coords": [1063, 394],
+#               "banner": "./theme_space/alien 9.png"},
+#         "J": {"connections": ["I"],
+#               "coords": [1014, 431],
+#               "banner": "./theme_space/alien 10.png"},
+#         "K": {"connections": ["D", "L", "O"],
+#               "coords": [697, 495],
+#               "banner": "./theme_space/alien 11.png"},
+#         "L": {"connections": ["K", "M"],
+#               "coords": [650, 536],
+#               "banner": "./theme_space/alien 12.png"},
+#         "M": {"connections": ["B", "L", "N"],
+#               "coords": [606, 568],
+#               "banner": "./theme_space/alien 13.png"},
+#         "N": {"connections": ["M", "O"],
+#               "coords": [540, 861],
+#               "banner": "./theme_space/alien 14.png"},
+#         "O": {"connections": ["K", "N"],
+#               "coords": [859, 807],
+#               "banner": "./theme_space/alien 15.png"}
+#     },
+#     "p1_occupied": ["A", "C", "E", "G", "I", "K", "M"],
+#     "p2_occupied": ["B", "D", "F", "H", "J", "L", "N", "O"]
+# }
+
+# default theme
+game_theme = theme_got
+
+def setTheme(new_theme):
+    game_theme = new_theme
 
 class CustomFont():
     def __init__(self):
         pygame.font.init()
-        domination_font = "./MyDominationFont.ttf"
+        domination_font = game_theme["font"]
         self.splash_title = pygame.font.Font(domination_font, 50)
         self.splash_button = pygame.font.Font(domination_font, 30)
         self.menu_heading = pygame.font.Font(domination_font, 30)
@@ -41,7 +154,7 @@ class CustomFont():
         self.menu_button = pygame.font.Font(domination_font, 30)
 
 
-class Menu():
+class PlayLoadGameMenu():
     def __init__(self):
 
         self.button_list = []
@@ -62,20 +175,24 @@ class Menu():
         button_text_no = 0
 
         # An initial array of identical buttons
-        for i in range(3):
+        for i in range(4):
             button_text_no = button_text_no + 1
             text_pos_y = y + 20
             self.button_list.append(Button(x, y, self.game_display))
 
             if button_text_no == 1:
-                text_surface = domination_font.splash_button.render("New Game", False, Colour.white)
+                text_surface = domination_font.splash_button.render("New GOT Game", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
             elif button_text_no == 2:
-                text_surface = domination_font.splash_button.render("Load Game", False, Colour.white)
+                text_surface = domination_font.splash_button.render("New Space Game", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
             elif button_text_no == 3:
+                text_surface = domination_font.splash_button.render("Load Game", False, Colour.white)
+                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
+
+            elif button_text_no == 4:
                 text_surface = domination_font.splash_button.render("Instructions", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
@@ -118,33 +235,6 @@ class Button(Graphic):
         pygame.display.update()
 
 
-class Icons():
-    def __init__(self):
-        self.user_node = 'B'
-        self.prior_node = 'G'
-        # Defines and sets up the network graph for the map
-        self.network_graph = {
-            "A": {"connections": ["B"],
-                  "coords": [520, 25]},
-            "B": {"connections": ["A", "C", "D", "E"],
-                  "coords": [525, 225]},
-            "C": {"connections": ["B", "F"],
-                  "coords": [371, 473]},
-            "D": {"connections": ["B", "E", "F", "G"],
-                  "coords": [505, 518]},
-            "E": {"connections": ["B", "D", "G"],
-                  "coords": [628, 459]},
-            "F": {"connections": ["C", "D", "H"],
-                  "coords": [414, 593]},
-            "G": {"connections": ["D", "E", "H", "I"],
-                  "coords": [613, 593]},
-            "H": {"connections": ["F", "G", "I", "J"],
-                  "coords": [468, 704]},
-            "I": {"connections": ["G", "H", "J"],
-                  "coords": [620, 735]},
-            "J": {"connections": ["H", "I"],
-                  "coords": [492, 853]}}
-        print(*self.network_graph["B"])
 
 class Icon(Graphic):
     def __init__(self, colour, x, y, node, shield):
@@ -193,7 +283,7 @@ class PaperButton():
         self.btn_label = ""
         self.text_on_paper = Colour.black
         self.domination_font = CustomFont()
-        self.picture = pygame.image.load("empty aged paper 30pc.jpg")
+        self.picture = pygame.image.load(game_theme["button_background"])
         self.button_id = ""
 
     def drawButton(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text, btn_id):
@@ -224,7 +314,7 @@ class PaperTroopArea():
         self.btn_label = ""
         self.text_on_paper = Colour.black
         self.domination_font = CustomFont()
-        self.picture = pygame.image.load("empty aged paper 30pc.jpg")
+        self.picture = pygame.image.load(game_theme["button_background"])
         self.button_id = ""
 
     def drawArea(self, surface, background_image, btn_width, btn_height, btn_x, btn_y, btn_text):
@@ -285,7 +375,7 @@ class SideMenuLeft():
         pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
 
         # side menu left buttons
-        btn_background = "empty aged paper 30pc.jpg"
+        btn_background = game_theme["button_background"]
         btn_save = PaperButton()
         btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game", "save")
         btn_info = PaperButton()
@@ -344,7 +434,7 @@ class TroopArea():
         # btn confirm to next stage
         self.btn_confirm_indent_from_left = 60
         self.btn_confirm_indent_from_bottom = 60
-        self.btn_confirm_background = "empty aged paper 30pc.jpg"
+        self.btn_confirm_background = game_theme["button_background"]
         self.btn_confirm_width = 200
         self.btn_confirm_height = 75
 
@@ -367,7 +457,7 @@ class TroopArea():
                 army_count_text_size = round(self.sigil_height / 1.5)
                 army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
                 max_renderable_armies = 32
-                army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 30 armies
+                army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 32 armies
                 army_count_display = str(armies_at_this_node)
 
                 players_launch_army_img = pygame.image.load(player["selected_node_banner"])
@@ -428,7 +518,7 @@ class SideMenuRight():
         self.menu_title_height = 60
 
         # Troop Area
-        self.troop_area_background = "scroll compass map 30pc.jpg"
+        self.troop_area_background = game_theme["troop_area_image_p1"]
         troop_area_indent_from_left = 0
         self.troop_area_height = 300
         troop_area_indent_from_top = self.menu_title_height
@@ -447,7 +537,7 @@ class SideMenuRight():
         self.btn_attack_xpos = self.menu_xpos + troop_area_indent_from_left
         self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_inbetween_height
         self.btn_attack_height = 60
-        self.btn_attack_background = "empty aged paper 30pc.jpg"
+        self.btn_attack_background = game_theme["button_background"]
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
@@ -534,15 +624,24 @@ class Board():
 
         # Side menu left
         self.side_menu_left = SideMenuLeft()
+        self.side_menu_right = SideMenuRight(0,0,0)
 
         # Board
-        self.board_width = 484 # width of map jpg
-        self.board_height = 941 # width of map jpg
-        self.board_position_x = 0 + self.side_menu_left.menu_width
-        self.board_position_y = 0
+        self.theme = game_theme
+        self.board_width = game_theme["map_width"]  # width of map jpg
+        self.board_height = game_theme["map_height"]  # height of map jpg
         self.stage = 1
         self.player_turn = ""
         self.possible_targets = []
+
+        # Icon information
+        self.icon_colour = Colour.medium_blue
+        self.icon_list = []
+
+    def renderLayout(self):
+        self.theme = game_theme
+        self.board_position_x = 0 + self.side_menu_left.menu_width
+        self.board_position_y = 0
 
         # Side menu right
         self.side_menu_right_position_x = 0 + self.side_menu_left.menu_width + self.board_width
@@ -553,10 +652,6 @@ class Board():
         self.display_width = self.side_menu_left.menu_width + self.board_width + self.side_menu_right.menu_width
         self.display_height = max(self.side_menu_left.menu_container_height, self.board_height, self.side_menu_right.menu_height)
 
-        # Icon information
-        self.icon_colour = Colour.medium_blue
-        self.icon_list = []
-
         # setting up the display
         self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
@@ -566,38 +661,38 @@ class Board():
         self.side_menu_left.drawItems(self.game_display, self.stage)
         self.side_menu_right.drawItems(self.game_display, self.stage)
         self.setUpIcons()
-        self.DisplayMap()
+        self.DisplayMap(self.theme)
+        pygame.display.update()
 
         # mouse
         self.mouse_selected_node = ""
         self.mouse_selected_launch_node = ""
         self.mouse_selected_attack_node = ""
 
-        pygame.display.update()
 
     def setUpMenuButtons(self):
         pass
 
     def setUpIcons(self):
         # X and Y coordinates of each icon
-        self.icon_list.append(Icon(self.icon_colour, 520, 25, "A", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 525, 225, "B", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 371, 473, "C", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 505, 518, "D", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 628, 459, "E", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 414, 593, "F", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 613, 593, "G", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 468, 704, "H", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 620, 735, "I", 'Shield1.fw.PNG'))
-        self.icon_list.append(Icon(self.icon_colour, 492, 853, "J", 'Shield1.fw.PNG'))
+        for key in game_theme["network_graph"]:
+            print ('setupIons', key)
+            x = game_theme["network_graph"][key]["coords"][0]
+            y = game_theme["network_graph"][key]["coords"][1]
+            self.icon_list.append(Icon(self.icon_colour, x, y, key, 'Shield1.fw.PNG'))
 
 
     def setUpMenuButtons(self):
         pass
 
-    def DisplayMap(self):
+    def DisplayMap(self, game_theme):
         # loading the map
-        map_img = pygame.image.load('GOT map 2.JPG')
+        print(game_theme)
+        map_width = game_theme["map_width"]
+        map_height = game_theme["map_height"]
+        map_img = pygame.image.load(game_theme["map_image"])
+
+        map_img = pygame.transform.scale(map_img, (map_width, map_height))
         self.game_display.blit(map_img, (self.board_position_x, self.board_position_y))
 
         pygame.display.update()
@@ -608,7 +703,7 @@ class PlayGame():
     def __init__(self, board):
 
         # side menu assistance variables
-        self.network_graph = {}
+        self.network_graph = game_theme["network_graph"]
         self.current_player_data = {}
         self.opposition_player_data = {}
 
@@ -620,6 +715,8 @@ class PlayGame():
         self.board = board
         self.side_menu_left = board.side_menu_left
         self.side_menu_right = board.side_menu_right
+
+        board.renderLayout()
 
 
 
@@ -647,7 +744,7 @@ class PlayGame():
         NoOfTroops = count
 
     def loadBoardState(self, game_state):
-        board.DisplayMap()
+        board.DisplayMap(game_state["game_theme"])
         player1 = game_state["current_player"]
         player2 = game_state["opposition_player"]
         if game_state["current_player"]["id"] == "p2":
@@ -768,12 +865,13 @@ class PlayGame():
         self.network_graph = game_state["network_graph"]
 
         board.player_turn = game_state["current_player"]
+        board.theme = game_state["game_theme"]
 
         if board.stage == 1:
             print("confirmed stage of allocate!", game_state)
             self.allocationStage(game_state)
         elif board.stage == 2:
-            print("confirmed stage of attack!")
+            print("confirmed stage of attack!", game_state)
             self.attack(game_state)
         print('0')
         self.loadBoardState(game_state)
@@ -788,6 +886,8 @@ class PlayGame():
                 ##### MOUSE CLICKED ###
                 #######################
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    print(mouse)
                     # Was a players node selected?
                     for icon in board.icon_list:
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
@@ -897,47 +997,16 @@ def initialTroopDeployment(player):
     return player
 
 def newGame(board):
-    network_graph = {
-        "A": {"connections": ["B"],
-              "coords": [520, 25],
-              "banner": "House-Whitewalker-Main-Shield.png"},
-        "B": {"connections": ["A", "C", "D", "E"],
-              "coords": [525, 225],
-              "banner": "House-Stark-Main-Shield.png"},
-        "C": {"connections": ["B", "F"],
-              "coords": [371, 473],
-              "banner": "House-Greyjoy-Main-Shield.png"},
-        "D": {"connections": ["B", "E", "F", "G", "C"],
-              "coords": [505, 518],
-              "banner": "House-Tully-Main-Shield.png"},
-        "E": {"connections": ["B", "D", "G"],
-              "coords": [628, 459],
-              "banner": "House-Arryn-Main-Shield.png"},
-        "F": {"connections": ["C", "D", "H"],
-              "coords": [414, 593],
-              "banner": "House-Lannister-Main-Shield.png"},
-        "G": {"connections": ["D", "E", "H", "I"],
-              "coords": [613, 593],
-              "banner": "House-Hoare-Main-Shield.png"},
-        "H": {"connections": ["F", "G", "I", "J"],
-              "coords": [468, 704],
-              "banner": "House-Tyrell-Main-Shield.png"},
-        "I": {"connections": ["G", "H", "J"],
-              "coords": [620, 735],
-              "banner": "House-Durrandon-Main-Shield.png"},
-        "J": {"connections": ["H", "I"],
-              "coords": [492, 853],
-              "banner": "House-Martell-Main-Shield.png"}}
     player1 = {
         "id": "p1",
         "display_name": "Player One",
-        "shield": "Shield 5.fw.PNG",
-        "playerOccupied": ["A", "D", "E", "H", "I"],
+        "shield": game_theme["shield_p1"],
+        "playerOccupied": game_theme["p1_occupied"],
         "unallocated_troops": 0,
         "troops_at_node": {},
         "selected_node": "",
         "selected_node_banner": "",
-        "troop_area_background": "scroll compass map 30pc.jpg"
+        "troop_area_background": game_theme["troop_area_image_p1"]
     }
     # player 1 initial territory allocation
     for node in player1["playerOccupied"]:
@@ -947,13 +1016,13 @@ def newGame(board):
     player2 = {
         "id": "p2",
         "display_name": "Player Two",
-        "shield": "Shield 2.fw.PNG",
-        "playerOccupied": ["B", "C", "F", "G", "J"],
+        "shield": game_theme["shield_p2"],
+        "playerOccupied": game_theme["p2_occupied"],
         "unallocated_troops": 0,
         "troops_at_node": {},
         "selected_node": "",
         "selected_node_banner": "",
-        "troop_area_background": "background grassy 30pc.jpg"
+        "troop_area_background": game_theme["troop_area_image_p2"]
     }
     # player 2 initial territory allocation
     for node in player2["playerOccupied"]:
@@ -964,7 +1033,8 @@ def newGame(board):
         "stage": board.stage,
         "current_player": player1,
         "opposition_player": player2,
-        "network_graph":  network_graph
+        "network_graph":   game_theme["network_graph"],
+        "game_theme": game_theme
     }
     board.player_turn = "p1"
 
@@ -978,6 +1048,11 @@ def newGame(board):
 def loadGame(board):
     with open('test_pickle.pkl', 'rb') as pickle_in:
         game_data = pickle.load(pickle_in)
+        print('load', game_data)
+        game_theme = game_data["game_theme"]
+        board.theme = game_theme
+        board.board_width = game_theme["map_width"]
+        board.board_height = game_theme["map_height"]
         play_game = PlayGame(board)
         play_game.playGame(game_data)
 
@@ -986,8 +1061,8 @@ if __name__ == "__main__":
 
     pygame.init()
     colour = Colour()
-    menu = Menu()
-    icons = Icons()
+    menu = PlayLoadGameMenu()
+    # icons = Icons()
     # changes in order to test objectifying the rectangle A
 
     # board = Board()
@@ -1011,7 +1086,7 @@ if __name__ == "__main__":
                 print(mouse)
                 button_found = False
                 button_number = 0
-                # sort out the button numbers, use iterative statements to define the button number// which botton was pressed
+                # sort out the button numbers, use iterative statements to define the button number// which button was pressed
                 while button_found == False:
                     button_number = button_number + 1
                     if button_max_x > mouse[0] > button_min_x and button_max_y > mouse[1] > button_min_y:
@@ -1022,16 +1097,24 @@ if __name__ == "__main__":
                         if button_number == 1:
                             # NEW Game
                             pygame.quit()
+                            game_theme = theme_got
                             board = Board()
                             play = PlayGame(board)
                             newGame(board)
                         elif button_number == 2:
+                            # NEW Game
+                            pygame.quit()
+                            game_theme = theme_space
+                            board = Board()
+                            play = PlayGame(board)
+                            newGame(board)
+                        elif button_number == 3:
                             # LOAD Game
                             pygame.quit()
                             board = Board()
                             loadGame(board)
                             pass
-                        elif button_number == 3:
+                        elif button_number == 4:
                             pygame.quit()
                             instructions = Instructions()
                             pygame.display.update()
