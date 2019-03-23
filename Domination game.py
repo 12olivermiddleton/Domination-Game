@@ -175,7 +175,7 @@ class PlayLoadGameMenu():
         button_text_no = 0
 
         # An initial array of identical buttons
-        for i in range(4):
+        for i in range(3):
             button_text_no = button_text_no + 1
             text_pos_y = y + 20
             self.button_list.append(Button(x, y, self.game_display))
@@ -184,15 +184,15 @@ class PlayLoadGameMenu():
                 text_surface = domination_font.splash_button.render("New GOT Game", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
-            elif button_text_no == 2:
-                text_surface = domination_font.splash_button.render("New Space Game", False, Colour.white)
-                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
+            # elif button_text_no == 2:
+            #     text_surface = domination_font.splash_button.render("New Space Game", False, Colour.white)
+            #     self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
-            elif button_text_no == 3:
+            elif button_text_no == 2:
                 text_surface = domination_font.splash_button.render("Load Game", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
-            elif button_text_no == 4:
+            elif button_text_no == 3:
                 text_surface = domination_font.splash_button.render("Instructions", False, Colour.white)
                 self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
@@ -1101,13 +1101,13 @@ if __name__ == "__main__":
                             board = Board()
                             play = PlayGame(board)
                             newGame(board)
-                        elif button_number == 2:
-                            # NEW Game
-                            pygame.quit()
-                            game_theme = theme_space
-                            board = Board()
-                            play = PlayGame(board)
-                            newGame(board)
+                        # elif button_number == 2:
+                        #     # NEW Game
+                        #     pygame.quit()
+                        #     game_theme = theme_space
+                        #     board = Board()
+                        #     play = PlayGame(board)
+                        #     newGame(board)
                         elif button_number == 3:
                             # LOAD Game
                             pygame.quit()
