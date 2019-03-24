@@ -599,19 +599,19 @@ class NodeGraphic():
 
         # Available to select
         if board.player_turn["id"] == player["id"]:
-            print("Available to select", self.node_network_name)
+            # print("Available to select", self.node_network_name)
             pygame.draw.rect(board.game_display, self.highlight_border_colour_available, highlight_rectangle, self.highlight_border_thickness)
         # Selected
         if self.node_network_name == board.mouse_selected_node:
-            print("Selected", self.node_network_name)
+            # print("Selected", self.node_network_name)
             pygame.draw.rect(board.game_display, self.highlight_border_colour_selected, highlight_rectangle)
         # Possible Enemy Node
         if self.node_network_name in board.possible_targets:
-            print("Possible Enemy", self.node_network_name)
+            # print("Possible Enemy", self.node_network_name)
             pygame.draw.rect(board.game_display, self.highlight_border_colour_enemy, highlight_rectangle, self.highlight_border_thickness)
         # Selected Enemy Node
         if self.node_network_name == board.mouse_selected_attack_node:
-            print("Selected Enemy", self.node_network_name)
+            # print("Selected Enemy", self.node_network_name)
             pygame.draw.rect(board.game_display, self.highlight_border_colour_enemy, highlight_rectangle)
 
         board.game_display.blit(pygame.image.load(player["shield"]), (self.pos_x, self.pos_y))
@@ -787,6 +787,7 @@ class PlayGame():
         # get number of troops on each node
         # randomly work out which army wins
         # get army sizes
+
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
         defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
         print(attacking_army_size, defending_army_size)
@@ -832,8 +833,6 @@ class PlayGame():
             self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = attacking_army_size - 1
             self.current_player_data["troops_at_node"][self.opposition_player_data["selected_node"]] = 1
             del self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
-            print(self.current_player_data)
-            print(self.opposition_player_data)
 
         else:
             self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = 1
@@ -846,18 +845,27 @@ class PlayGame():
         game_state["current_player"] = self.current_player_data
         game_state["opposition_player"] = self.opposition_player_data
 
-        self.loadBoardState(game_state)
-        print(self.current_player_data)
-        print(self.opposition_player_data)
+        print(game_state["stage"])
+        game_state["stage"] = 3
+        board.mouse_selected_node = ""
+        board.mouse_selected_attack_node = ""
+        board.mouse_selected_launch_node = ""
+        board.possible_targets = []
 
-    def attack(self, game_state):
+        self.loadBoardState(game_state)
+        self.renderStage(game_state)
+
+    def renderStage(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         self.side_menu_right.drawItems(board.game_display, game_state["stage"])
-        print("Executing Attack function")
+        print("Executing ", game_state["stage"], " function")
         pass
 
-    def fortify(self):
-        pass
+    def fortify(self, game_state):
+
+        for current_node in game_state["current_player"]["playerOccupied"]:
+           pass
+
 
     def playGame(self, game_state):
 
@@ -874,7 +882,10 @@ class PlayGame():
             self.allocationStage(game_state)
         elif board.stage == 2:
             print("confirmed stage of attack!", game_state)
-            self.attack(game_state)
+            self.renderStage(game_state)
+        elif board.stage == 3:
+            print("confirm stage of fortify!", game_state)
+            # self.renderStage(game_state)
         print('0')
         self.loadBoardState(game_state)
         while not self.crashed:
@@ -889,7 +900,6 @@ class PlayGame():
                 #######################
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    print(mouse)
                     # Was a players node selected?
                     for icon in board.icon_list:
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
@@ -932,6 +942,8 @@ class PlayGame():
                                         game_state["opposition_player"]["selected_node_banner"] = ""
                                         board.mouse_selected_attack_node = ""
                                         board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
+                                    elif board.stage == 3:
+                                        pass
 
                                     self.loadBoardState(game_state)
                                 else:
@@ -939,7 +951,7 @@ class PlayGame():
                                     pass
                         else:
                             # mouse clicked away from any node
-                            print ("here")
+                            pass
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
