@@ -6,10 +6,8 @@
 import pygame
 import pickle
 import random
-import pprint
+import copy
 import time
-
-pp = pprint.PrettyPrinter(indent=4)
 
 
 class Colour():
@@ -35,6 +33,10 @@ theme_got = {
     "map_width": 460,
     "map_height": 950,
     "button_background": "./theme_got/empty aged paper 30pc.jpg",
+    "button_add1": "button_add1.png",
+    "button_add5": "button_add5.png",
+    "button_rem1": "button_remove1.png",
+    "button_rem5": "button_remove5.png",
     "shield_p1": "./theme_got/Shield 5.fw.PNG",
     "shield_p2": "./theme_got/Shield 2.fw.PNG",
     "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
@@ -81,6 +83,10 @@ theme_got = {
 #     "map_width": 862,
 #     "map_height": 1019,
 #     "button_background": "./theme_space/orange_paper.jpg",
+#     "button_add1": "button_add1.png",
+#     "button_add5": "button_add5.png",
+#     "button_rem1": "button_remove1.png",
+#     "button_rem5": "button_remove5.png",
 #     "shield_p1": "./theme_space/Shield 2.fw.PNG",
 #     "shield_p2": "./theme_space/Shield 5.fw.PNG",
 #     "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
@@ -292,7 +298,7 @@ class PaperButton():
         self.button_id = btn_id
         self.button_rectangle = self.picture.get_rect()
         self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
-        if any(char.isalpha() for char in str(btn_text)):
+        if all(char.isalpha() for char in str(btn_text)):
             btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
         else:
             myfont = pygame.font.SysFont("Comic Sans MS", 20)
@@ -377,7 +383,7 @@ class SideMenuLeft():
         # side menu left buttons
         btn_background = game_theme["button_background"]
         btn_save = PaperButton()
-        btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save Game", "save")
+        btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save", "save")
         btn_info = PaperButton()
         btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info", "info")
         btn_quit = PaperButton()
@@ -452,7 +458,7 @@ class TroopArea():
 
         ## Troop Stack
         if player["selected_node"] != "":
-            if board.stage == 2:
+            if board.stage <= 2:
                 armies_at_this_node = player["troops_at_node"][player["selected_node"]]
                 army_count_text_size = round(self.sigil_height / 1.5)
                 army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
@@ -496,8 +502,9 @@ class TroopArea():
             btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
             btn_id = "confirm" + player["shield"]
             if player["unallocated_troops"] == 0:
-                btn_confirm = PaperButton()
-                btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
+                if player["display_name"] == "Available Troops":
+                    btn_confirm = PaperButton()
+                    btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
 
 
 class SideMenuRight():
@@ -524,18 +531,18 @@ class SideMenuRight():
         troop_area_indent_from_top = self.menu_title_height
         self.player_troop_banner_width = 100
         self.player_troop_banner_height = 100
-        self.troop_area_inbetween_height = 60
+        self.troop_area_gap_height = 60
 
-        self.player1_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.player1_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
+        self.top_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.top_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
         self.troop_area_gap_xpos = self.menu_xpos + troop_area_indent_from_left
         self.troop_area_gap_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height
-        self.player2_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.player2_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_inbetween_height
-        self.player2_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.player2_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_inbetween_height
+        self.lower_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.lower_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
+        self.lower_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.lower_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
         self.btn_attack_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_inbetween_height
+        self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_gap_height
         self.btn_attack_height = 60
         self.btn_attack_background = game_theme["button_background"]
 
@@ -545,24 +552,56 @@ class SideMenuRight():
         pygame.draw.rect(surface, self.initial_colour,(self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
         if stage == 1:
             stage_text = "Allocate troops"
+            inbetween_text = domination_font.menu_heading.render("ADD REMOVE", False, Colour.white)
+            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
+
         elif stage == 2:
             stage_text = "Prepare the Attack"
-            inbetween_text1 = domination_font.menu_heading.render("Vs", False, Colour.white)
-            surface.blit(inbetween_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text1), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_inbetween_height, inbetween_text1)))
+            inbetween_text = domination_font.menu_heading.render("Vs", False, Colour.white)
+            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
 
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
-    def drawTroopAllocationArea(self, board, player1_state, player2_state):
-        player1_troop_area_backing = PaperTroopArea()
-        player2_troop_area_backing = PaperTroopArea()
+    def drawTroopAllocationArea(self, board, game_state):
+        top_troop_area_backing = PaperTroopArea()
+        lower_troop_area_backing = PaperTroopArea()
         backing_text_p1 = ""
         backing_text_p2 = ""
         if board.stage == 1:
-            backing_text_p1 = player1_state["unallocated_troops"]
-            backing_text_p2 = player2_state["unallocated_troops"]
+            # ADD REMOVE troops Controls
+            # Putting troops on the bench if they are unallocated.
+            bench_state = copy.deepcopy(game_state["current_player"])
+            bench_state["display_name"] = "Available Troops"
+            bench_state["selected_node_banner"] = bench_state["shield"]
+            if bench_state["selected_node"] != "":
+                bench_state["troops_at_node"][bench_state["selected_node"]] = bench_state["unallocated_troops"]
+            btn_gap_between_width = 20
+            btn_in_gap_width = 40
+            btn_add5_id = "add5"
+            btn_add1_id = "add1"
+            btn_rem1_id = "rem1"
+            btn_rem5_id = "rem5"
+            btn_add_five_xpos = self.troop_area_gap_xpos
+            btn_add_one_xpos = self.troop_area_gap_xpos + btn_in_gap_width + btn_gap_between_width
+            btn_rem_one_xpos = self.troop_area_gap_xpos + self.menu_width - btn_in_gap_width - btn_gap_between_width - btn_in_gap_width
+            btn_rem_five_xpos = self.troop_area_gap_xpos + self.menu_width - btn_in_gap_width
+            btn_add_five = PaperButton()
+            btn_add_one = PaperButton()
+            btn_rem_one = PaperButton()
+            btn_rem_five = PaperButton()
+            btn_add_five.drawButton(board.game_display, game_theme["button_add5"], btn_in_gap_width, self.troop_area_gap_height, btn_add_five_xpos, self.troop_area_gap_ypos, "", btn_add5_id)
+            btn_add_one.drawButton(board.game_display, game_theme["button_add1"], btn_in_gap_width, self.troop_area_gap_height, btn_add_one_xpos,  self.troop_area_gap_ypos, "", btn_add1_id)
+            btn_rem_one.drawButton(board.game_display, game_theme["button_rem1"], btn_in_gap_width, self.troop_area_gap_height, btn_rem_one_xpos,  self.troop_area_gap_ypos, "", btn_rem1_id)
+            btn_rem_five.drawButton(board.game_display, game_theme["button_rem5"], btn_in_gap_width, self.troop_area_gap_height, btn_rem_five_xpos,  self.troop_area_gap_ypos, "", btn_rem5_id)
+            top_troop_area_backing.drawArea(board.game_display, game_state["current_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.top_troop_area_xpos, self.top_troop_area_ypos, backing_text_p1)
+            lower_troop_area_backing.drawArea(board.game_display, game_state["current_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.lower_troop_area_xpos, self.lower_troop_area_ypos, backing_text_p2)
+            top_troop_area = TroopArea()
+            lower_troop_area = TroopArea()
+            top_troop_area.drawTroopArea(board, game_state["current_player"], self.top_troop_area_xpos, self.top_troop_area_ypos)
+            lower_troop_area.drawTroopArea(board, bench_state, self.lower_troop_area_xpos, self.lower_troop_area_ypos)
         elif board.stage == 2:
-            if player1_state["selected_node"] != "" and player2_state["selected_node"] != "":
+            if game_state["current_player"]["selected_node"] != "" and game_state["opposition_player"]["selected_node"] != "":
                 ## Confirm Attack Button
                 btn_attack = PaperButton()
                 btn_id = "attack"
@@ -570,13 +609,12 @@ class SideMenuRight():
             else:
                 # Redraw self to remove "attack" button
                 self.drawItems(board.game_display, board.stage)
-
-        player1_troop_area_backing.drawArea(board.game_display, player1_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player1_troop_area_xpos, self.player1_troop_area_ypos, backing_text_p1)
-        player2_troop_area_backing.drawArea(board.game_display, player2_state["troop_area_background"], self.menu_width, self.troop_area_height, self.player2_troop_area_xpos, self.player2_troop_area_ypos, backing_text_p2)
-        player1_troop_area = TroopArea()
-        player2_troop_area = TroopArea()
-        player1_troop_area.drawTroopArea(board, player1_state, self.player1_troop_area_xpos, self.player1_troop_area_ypos)
-        player2_troop_area.drawTroopArea(board, player2_state, self.player2_troop_area_xpos, self.player2_troop_area_ypos)
+            top_troop_area_backing.drawArea(board.game_display, game_state["current_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.top_troop_area_xpos, self.top_troop_area_ypos, backing_text_p1)
+            lower_troop_area_backing.drawArea(board.game_display, game_state["opposition_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.lower_troop_area_xpos, self.lower_troop_area_ypos, backing_text_p2)
+            player1_troop_area = TroopArea()
+            player2_troop_area = TroopArea()
+            player1_troop_area.drawTroopArea(board, game_state["current_player"], self.top_troop_area_xpos, self.top_troop_area_ypos)
+            player2_troop_area.drawTroopArea(board, game_state["opposition_player"], self.lower_troop_area_xpos, self.lower_troop_area_ypos)
 
 class NodeGraphic():
     def __init__(self):
@@ -759,7 +797,7 @@ class PlayGame():
                     node_shape.pos_y = self.network_graph[node]["coords"][1]
                     node_shape.node_network_name = node
                     node_shape.drawNode(board, player)
-                    board.side_menu_right.drawTroopAllocationArea(board, player1, player2)
+            board.side_menu_right.drawTroopAllocationArea(board, game_state)
             pygame.display.update()
         pygame.display.update()
 
@@ -931,6 +969,9 @@ class PlayGame():
                                     # game_state["opposition_player"]["selected_node_banner"] = ""
                             else:
                                 # A node of the current player was clicked on
+                                game_state["current_player"]["selected_node"] = icon.node
+                                game_state["current_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
+
                                 if board.mouse_selected_node != icon.node:
                                     # A different node of the current player was clicked on
                                     board.mouse_selected_node = icon.node
@@ -1054,7 +1095,7 @@ def newGame(board):
 
     initial_game_state["current_player"] = initialTroopDeployment(initial_game_state["current_player"])
     initial_game_state["opposition_player"] = initialTroopDeployment(initial_game_state["opposition_player"])
-    initial_game_state["stage"] = 2
+    initial_game_state["stage"] = 1
 
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
