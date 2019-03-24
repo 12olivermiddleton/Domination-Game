@@ -20,7 +20,7 @@ class Colour():
     aqua = pygame.Color(0, 255, 255)
     black = pygame.Color(0, 0, 0)
     pink = pygame.Color(255, 200, 200)
-    darkGrey = pygame.Color(23, 26, 37)
+    dark_grey = pygame.Color(23, 26, 37)
 
 class SigilBanner():
     height= 50
@@ -170,7 +170,7 @@ class PlayLoadGameMenu():
 
         self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Menu')
-        self.game_display.fill(Colour.darkGrey)
+        self.game_display.fill(Colour.dark_grey)
 
         text_surface = domination_font.splash_title.render("Domination", False, Colour.white)
         self.game_display.blit(text_surface, (110, 50))
@@ -361,7 +361,7 @@ class SideMenuLeft():
         self.status_colour = Colour.white
         self.text_on_paper = Colour.black
         self.current_colour = Colour.red
-        self._stage_colour = Colour.black
+        self.stage_colour = Colour.black
 
         self.menu_container_height = self.y_pos_stage_menu + self.stage_height
 
@@ -374,12 +374,6 @@ class SideMenuLeft():
         self.menu_button_vertical_spacing = self.menu_button_height + self.menu_button_vertical_gap
 
     def drawItems(self, surface, stage):  # example of method overloading
-        # border lines for side menu
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3) # across bottom
-        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3) # down left side
-        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3) # down right side
-
         # side menu left buttons
         btn_background = game_theme["button_background"]
         btn_save = PaperButton()
@@ -401,11 +395,12 @@ class SideMenuLeft():
         stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
         surface.blit(stage_text, (centreJustifyButton(self.x_pos_menu_buttons_container_indent, self.menu_button_width, stage_text), 825))
 
-        allocation_text = domination_font.menu_action.render("Allocate", False, self._stage_colour)
-        attack_text = domination_font.menu_action.render("Attack", False, self._stage_colour)
-        fortify_text = domination_font.menu_action.render("Fortify", False, self._stage_colour)
+        allocation_text = domination_font.menu_action.render("Allocate", False, self.stage_colour)
+        attack_text = domination_font.menu_action.render("Attack", False, self.stage_colour)
+        fortify_text = domination_font.menu_action.render("Fortify", False, self.stage_colour)
 
-        if stage > 0:
+        pygame.draw.rect(surface, Colour.dark_grey, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.menu_width, self.stage_height))
+        if stage >= 0:
             surface.blit(allocation_text, (centreJustifyButton(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
         if stage > 1:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
@@ -413,6 +408,12 @@ class SideMenuLeft():
         if stage > 2:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
             surface.blit(fortify_text,(centreJustifyButton(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
+        # border lines for side menu
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3)  # across bottom
+        pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3)  # down left side
+        pygame.draw.line(surface, Colour.white, (self.menu_width, self.y_pos_menu_container), (self.menu_width, self.menu_container_height), 3)  # down right side
+
         pygame.display.update()
 
 class TroopArea():
@@ -458,49 +459,49 @@ class TroopArea():
 
         ## Troop Stack
         if player["selected_node"] != "":
-            if board.stage <= 2:
-                armies_at_this_node = player["troops_at_node"][player["selected_node"]]
-                army_count_text_size = round(self.sigil_height / 1.5)
-                army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
-                max_renderable_armies = 32
-                army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 32 armies
-                army_count_display = str(armies_at_this_node)
 
-                players_launch_army_img = pygame.image.load(player["selected_node_banner"])
-                players_launch_army_img = pygame.transform.scale(players_launch_army_img, (self.sigil_width, self.sigil_height))
-                sigil_xpos_spacer = self.sigil_width + self.sigil_spacer
-                sigil_ypos_spacer = self.sigil_height + self.sigil_spacer
+            armies_at_this_node = player["troops_at_node"][player["selected_node"]]
+            army_count_text_size = round(self.sigil_height / 1.5)
+            army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
+            max_renderable_armies = 32
+            army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 32 armies
+            army_count_display = str(armies_at_this_node)
 
-                for army_index in range(army_display_spaces):
-                    ## Stack the Sigils
-                    if player["selected_node_banner"]:
-                        # spaced along x
+            players_launch_army_img = pygame.image.load(player["selected_node_banner"])
+            players_launch_army_img = pygame.transform.scale(players_launch_army_img, (self.sigil_width, self.sigil_height))
+            sigil_xpos_spacer = self.sigil_width + self.sigil_spacer
+            sigil_ypos_spacer = self.sigil_height + self.sigil_spacer
+
+            for army_index in range(army_display_spaces):
+                ## Stack the Sigils
+                if player["selected_node_banner"]:
+                    # spaced along x
+                    sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
+                    sigil_ypos = pos_y + self.shield_square_height + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
+                    # rowed down y
+                    if sigil_xpos + 2 * sigil_xpos_spacer > self.troop_area_xpos + self.troop_area_width:
+                        self.army_index_new_row = army_index
+                        self.army_index_row = self.army_index_row + 1
                         sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
-                        sigil_ypos = pos_y + self.shield_square_height + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
-                        # rowed down y
-                        if sigil_xpos + 2 * sigil_xpos_spacer > self.troop_area_xpos + self.troop_area_width:
-                            self.army_index_new_row = army_index
-                            self.army_index_row = self.army_index_row + 1
-                            sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
-                            sigil_ypos = pos_y + self.shield_square_height + + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
+                        sigil_ypos = pos_y + self.shield_square_height + + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
 
-                        # dray army item
-                        sigil_rectangle = players_launch_army_img.get_rect()
-                        sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
-                        board.game_display.blit(players_launch_army_img, sigil_rectangle)
+                    # dray army item
+                    sigil_rectangle = players_launch_army_img.get_rect()
+                    sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
+                    board.game_display.blit(players_launch_army_img, sigil_rectangle)
 
-                        # display the army size
-                        if army_index == army_display_spaces - 1:
-                            if armies_at_this_node > max_renderable_armies:
-                                army_count_display = ".." + army_count_display  ## > max renderable
-                            army_count_surface = army_count_font.render(army_count_display, False, Colour.black)
-                            board.game_display.blit(army_count_surface, (sigil_xpos + sigil_xpos_spacer, sigil_ypos))
+                    # display the army size
+                    if army_index == army_display_spaces - 1:
+                        if armies_at_this_node > max_renderable_armies:
+                            army_count_display = ".." + army_count_display  ## > max renderable
+                        army_count_surface = army_count_font.render(army_count_display, False, Colour.black)
+                        board.game_display.blit(army_count_surface, (sigil_xpos + sigil_xpos_spacer, sigil_ypos))
 
         ## Confirm Allocate Button
-        if board.stage == 1:
+        if board.stage in [0, 1, 3]:
             btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
             btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
-            btn_id = "confirm" + player["shield"]
+            btn_id = "confirm"
             if player["unallocated_troops"] == 0:
                 if player["display_name"] == "Available Troops":
                     btn_confirm = PaperButton()
@@ -513,7 +514,7 @@ class SideMenuRight():
         # Colours
         self.status_colour = Colour.white
         self.current_colour = Colour.red
-        self.initial_colour = Colour.darkGrey
+        self.initial_colour = Colour.dark_grey
 
         # Menu Container
         self.menu_xpos = menu_xpos
@@ -548,15 +549,14 @@ class SideMenuRight():
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
-        stage_text = ""
+        stage_texts = ["Allocate troops", "Allocate troops", "Prepare the Attack", "Fortify"]
+        stage_text = stage_texts[stage]
         pygame.draw.rect(surface, self.initial_colour,(self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
-        if stage == 1:
-            stage_text = "Allocate troops"
+        if stage in [0, 1, 3]:
             inbetween_text = domination_font.menu_heading.render("ADD REMOVE", False, Colour.white)
             surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
 
         elif stage == 2:
-            stage_text = "Prepare the Attack"
             inbetween_text = domination_font.menu_heading.render("Vs", False, Colour.white)
             surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
 
@@ -568,7 +568,7 @@ class SideMenuRight():
         lower_troop_area_backing = PaperTroopArea()
         backing_text_p1 = ""
         backing_text_p2 = ""
-        if board.stage == 1:
+        if board.stage in[0, 1, 3]:
             # ADD REMOVE troops Controls
             # Putting troops on the bench if they are unallocated.
             bench_state = copy.deepcopy(game_state["current_player"])
@@ -668,7 +668,7 @@ class Board():
         self.theme = game_theme
         self.board_width = game_theme["map_width"]  # width of map jpg
         self.board_height = game_theme["map_height"]  # height of map jpg
-        self.stage = 1
+        self.stage = 0
         self.player_turn = ""
         self.possible_targets = []
 
@@ -693,7 +693,7 @@ class Board():
         # setting up the display
         self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
         pygame.display.set_caption('Domination Game!')
-        self.game_display.fill(Colour.darkGrey)
+        self.game_display.fill(Colour.dark_grey)
         self.clock = pygame.time.Clock()
         ######
         self.side_menu_left.drawItems(self.game_display, self.stage)
@@ -714,7 +714,6 @@ class Board():
     def setUpIcons(self):
         # X and Y coordinates of each icon
         for key in game_theme["network_graph"]:
-            print ('setupIons', key)
             x = game_theme["network_graph"][key]["coords"][0]
             y = game_theme["network_graph"][key]["coords"][1]
             self.icon_list.append(Icon(self.icon_colour, x, y, key, 'Shield1.fw.PNG'))
@@ -725,7 +724,6 @@ class Board():
 
     def DisplayMap(self, game_theme):
         # loading the map
-        print(game_theme)
         map_width = game_theme["map_width"]
         map_height = game_theme["map_height"]
         map_img = pygame.image.load(game_theme["map_image"])
@@ -828,7 +826,6 @@ class PlayGame():
 
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
         defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
-        print(attacking_army_size, defending_army_size)
 
         # dice roll generator
         def getDiceRollsFor(army_size):
@@ -883,7 +880,6 @@ class PlayGame():
         game_state["current_player"] = self.current_player_data
         game_state["opposition_player"] = self.opposition_player_data
 
-        print(game_state["stage"])
         game_state["stage"] = 3
         board.mouse_selected_node = ""
         board.mouse_selected_attack_node = ""
@@ -899,10 +895,6 @@ class PlayGame():
         print("Executing ", game_state["stage"], " function")
         pass
 
-    def fortify(self, game_state):
-
-        for current_node in game_state["current_player"]["playerOccupied"]:
-           pass
 
 
     def playGame(self, game_state):
@@ -915,16 +907,21 @@ class PlayGame():
         board.player_turn = game_state["current_player"]
         board.theme = game_state["game_theme"]
 
-        if board.stage == 1:
-            print("confirmed stage of allocate!", game_state)
+        if board.stage == 0:
+            print("confirmed stage of allocate initial board!")
             self.allocationStage(game_state)
+            self.renderStage(game_state)
+        if board.stage == 1:
+            print("confirmed stage of allocate!")
+            self.allocationStage(game_state)
+            self.renderStage(game_state)
         elif board.stage == 2:
-            print("confirmed stage of attack!", game_state)
+            print("confirmed stage of attack!")
             self.renderStage(game_state)
         elif board.stage == 3:
-            print("confirm stage of fortify!", game_state)
-            # self.renderStage(game_state)
-        print('0')
+            print("confirm stage of fortify!")
+            self.renderStage(game_state)
+
         self.loadBoardState(game_state)
         while not self.crashed:
             for event in pygame.event.get():
@@ -965,8 +962,6 @@ class PlayGame():
                                 else:
                                     # default stage behaviour is selecting enemy node cancels current node selection
                                     board.mouse_selected_node = ""
-                                    # game_state["current_player"]["selected_node_banner"] = ""
-                                    # game_state["opposition_player"]["selected_node_banner"] = ""
                             else:
                                 # A node of the current player was clicked on
                                 game_state["current_player"]["selected_node"] = icon.node
@@ -983,8 +978,6 @@ class PlayGame():
                                         game_state["opposition_player"]["selected_node_banner"] = ""
                                         board.mouse_selected_attack_node = ""
                                         board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
-                                    elif board.stage == 3:
-                                        pass
 
                                     self.loadBoardState(game_state)
                                 else:
@@ -996,22 +989,43 @@ class PlayGame():
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
-                            # Allocate
-                            if board.stage == 1:
-                                if button == ("confirm" + self.current_player_data["shield"]):
+                            # Allocate  - first board setup
+                            if board.stage <= 1:
+                                if button == ("confirm"):
                                     # Proceed to next player or next stage
-                                    if self.current_player_data["id"] == "p1":
+                                    self.current_player_data["selected_node"] = ""
+                                    self.current_player_data["selected_node_banner"] = ""
+                                    board.mouse_selected_node = ""
+                                    if board.stage == 0:
                                         game_state["opposition_player"] = self.current_player_data
                                         game_state["current_player"] = self.opposition_player_data
-                                        self.playGame(game_state)
-                                    else:
-                                        game_state["stage"] = board.stage + 1
-                                        self.playGame(game_state)
+                                        if self.current_player_data["id"] == "p2":
+                                            game_state["stage"] = 2
+
+                                    if board.stage == 1:
+                                        game_state["stage"] = 2
+                                troopAllocate(board, game_state, button)
+                                self.playGame(game_state)
 
                             # Attack
                             if board.stage == 2:
                                 if button == "attack":
                                     self.fight(game_state)
+                                    self.playGame(game_state)
+
+                            # Fortify
+                            if board.stage == 3:
+                                if board.mouse_selected_node != "":
+                                    troopAllocate(board, game_state, button)
+                                if button == "confirm":
+                                    self.current_player_data["selected_node"] = ""
+                                    self.current_player_data["selected_node_banner"] = ""
+                                    board.mouse_selected_node = ""
+                                    game_state["opposition_player"] = self.current_player_data
+                                    game_state["current_player"] = self.opposition_player_data
+                                    game_state["stage"] = 1
+                                self.playGame(game_state)
+
                             # Save Game
                             if button == "save":
                                 self.saveGame(game_state)
@@ -1025,19 +1039,38 @@ class PlayGame():
                         print("selected node: " + board.mouse_selected_node)
 
                         if event.key == pygame.K_UP:
-                            if board.stage == 1:
+                            if board.stage <= 1:
                                 if self.current_player_data["unallocated_troops"] > 0:
-                                    self.current_player_data["unallocated_troops"] = self.current_player_data["unallocated_troops"] - 1
-                                    self.current_player_data["troops_at_node"][board.mouse_selected_node] = self.current_player_data["troops_at_node"][board.mouse_selected_node] + 1
+                                    troopAllocate(board, game_state, "add1")
 
                         elif event.key == pygame.K_DOWN:
-                            if board.stage == 1:
+                            if board.stage <= 1:
                                 if self.current_player_data["troops_at_node"][board.mouse_selected_node] > 1:
-                                    self.current_player_data["unallocated_troops"] = self.current_player_data[ "unallocated_troops"] + 1
-                                    self.current_player_data["troops_at_node"][board.mouse_selected_node] = self.current_player_data["troops_at_node"][board.mouse_selected_node] - 1
+                                    troopAllocate(board, game_state, "rem1")
                         self.loadBoardState(game_state)
                     else:
                         print("no mouse selected node!" + board.mouse_selected_node)
+
+def troopAllocate(board, game_state, button):
+    print (button, game_state["current_player"], board.mouse_selected_node)
+    def moveTroops(troops):
+        game_state["current_player"]["unallocated_troops"] = game_state["current_player"]["unallocated_troops"] - troops
+        game_state["current_player"]["troops_at_node"][board.mouse_selected_node] = game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + troops
+
+    if button == "add5":
+        if game_state["current_player"]["unallocated_troops"] >= 5:
+            moveTroops(5)  # Allocate 5
+        else:
+            moveTroops(game_state["current_player"]["unallocated_troops"])  # Allocate whatever is left
+    elif button == "add1" and game_state["current_player"]["unallocated_troops"] > 0:
+        moveTroops(1)  # Allocate 1
+    elif button == "rem1" and game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 1:
+        moveTroops(-1)  # Bench 1
+    elif button == "rem5":
+        if game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 5:
+            moveTroops(-5)  # Bench 5
+        else:
+            moveTroops(0 - game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + 1)  # Bench all but one troop
 
 def initialTroopDeployment(player):
     while player["unallocated_troops"] > 0:
@@ -1095,7 +1128,7 @@ def newGame(board):
 
     initial_game_state["current_player"] = initialTroopDeployment(initial_game_state["current_player"])
     initial_game_state["opposition_player"] = initialTroopDeployment(initial_game_state["opposition_player"])
-    initial_game_state["stage"] = 1
+    initial_game_state["stage"] = 0
 
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
