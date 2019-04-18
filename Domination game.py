@@ -508,6 +508,50 @@ class TroopArea():
                     btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
 
 
+class MessageArea():
+    def __init__(self):
+        self.domination_font = CustomFont()
+
+        # Player Troop area
+        self.message_area_indent_from_left = 0
+        self.message_area_indent_from_top = 60
+        self.message_area_width = 0
+        self.message_area_height = 300
+        self.message_area_xpos = 0
+        self.message_area_ypos = 0
+        self.message_area_indent_test = 10
+        self.messages = {
+            "font_size": 19,
+            0: ["Select one of your armies and allocate the new",
+                "troops to them. When all your troops are allocated",
+                "press Confirm."],
+            1: ["Select one of your armies and allocate the new",
+                "troops to them. When all your troops are allocated",
+                "press Confirm."],
+            2: ["Select one of your armies (blue border) to launch the ",
+                "attack from. Then select a target (red border) to attack."],
+            3: ["Select one of your armies to fetch troops from. Use",
+                "the controls to add or remove troops. Then select",
+                "another army to reinforce to attack. After all your ",
+                "reinforcements are allocated, Press Confirm."],
+        }
+
+    def drawMessageArea(self, board, pos_x, pos_y):
+        print ('MessageArea', pos_x, pos_y, board.stage)
+        self.message_area_width = board.side_menu_right.menu_width
+        self.message_area_xpos = pos_x
+        self.message_area_ypos = pos_y
+        message_paragraph = self.messages[board.stage]
+        myfont = pygame.font.SysFont("Comic Sans MS", self.messages["font_size"])
+
+        pygame.draw.rect(board.game_display, Colour.white,(self.message_area_xpos, self.message_area_ypos, self.message_area_width, self.message_area_height))
+        line_count = 0
+        for line in message_paragraph:
+            message_text = myfont.render(line, False, Colour.black)
+            board.game_display.blit(message_text, (self.message_area_xpos + self.message_area_indent_test, self.message_area_ypos + line_count * myfont.get_height()))
+            line_count = line_count + 1
+
+
 class SideMenuRight():
     def __init__(self, menu_xpos, menu_ypos, menu_height):
 
@@ -527,25 +571,30 @@ class SideMenuRight():
 
         # Troop Area
         self.troop_area_background = game_theme["troop_area_image_p1"]
-        troop_area_indent_from_left = 0
+        area_indent_from_left = 0
         self.troop_area_height = 300
         troop_area_indent_from_top = self.menu_title_height
         self.player_troop_banner_width = 100
         self.player_troop_banner_height = 100
-        self.troop_area_gap_height = 60
+        self.gap_height = 60
 
-        self.top_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
+        # Message Area
+        self.message_area_height = 500
+
+        self.top_troop_area_xpos = self.menu_xpos + area_indent_from_left
         self.top_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
-        self.troop_area_gap_xpos = self.menu_xpos + troop_area_indent_from_left
+        self.troop_area_gap_xpos = self.menu_xpos + area_indent_from_left
         self.troop_area_gap_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height
-        self.lower_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.lower_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
-        self.lower_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.lower_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
-        self.btn_attack_xpos = self.menu_xpos + troop_area_indent_from_left
-        self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_gap_height
+        self.lower_troop_area_xpos = self.menu_xpos + area_indent_from_left
+        self.lower_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.gap_height
+        self.lower_troop_banner_xpos = self.menu_xpos + area_indent_from_left
+        self.lower_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.gap_height
+        self.btn_attack_xpos = self.menu_xpos + area_indent_from_left
+        self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.gap_height
         self.btn_attack_height = 60
         self.btn_attack_background = game_theme["button_background"]
+        self.message_area_xpos = self.menu_xpos + area_indent_from_left
+        self.message_area_ypos = self.btn_attack_ypos + self.btn_attack_height + self.gap_height
 
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
@@ -554,11 +603,11 @@ class SideMenuRight():
         pygame.draw.rect(surface, self.initial_colour,(self.menu_xpos, self.menu_ypos, self.menu_width, self.menu_height))
         if stage in [0, 1, 3]:
             inbetween_text = domination_font.menu_heading.render("ADD REMOVE", False, Colour.white)
-            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
+            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.gap_height, inbetween_text)))
 
         elif stage == 2:
             inbetween_text = domination_font.menu_heading.render("Vs", False, Colour.white)
-            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.troop_area_gap_height, inbetween_text)))
+            surface.blit(inbetween_text, (centreJustifyButton(self.menu_xpos, self.menu_width, inbetween_text), verticalJustifyButton(self.troop_area_gap_ypos, self.gap_height, inbetween_text)))
 
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
@@ -590,10 +639,10 @@ class SideMenuRight():
             btn_add_one = PaperButton()
             btn_rem_one = PaperButton()
             btn_rem_five = PaperButton()
-            btn_add_five.drawButton(board.game_display, game_theme["button_add5"], btn_in_gap_width, self.troop_area_gap_height, btn_add_five_xpos, self.troop_area_gap_ypos, "", btn_add5_id)
-            btn_add_one.drawButton(board.game_display, game_theme["button_add1"], btn_in_gap_width, self.troop_area_gap_height, btn_add_one_xpos,  self.troop_area_gap_ypos, "", btn_add1_id)
-            btn_rem_one.drawButton(board.game_display, game_theme["button_rem1"], btn_in_gap_width, self.troop_area_gap_height, btn_rem_one_xpos,  self.troop_area_gap_ypos, "", btn_rem1_id)
-            btn_rem_five.drawButton(board.game_display, game_theme["button_rem5"], btn_in_gap_width, self.troop_area_gap_height, btn_rem_five_xpos,  self.troop_area_gap_ypos, "", btn_rem5_id)
+            btn_add_five.drawButton(board.game_display, game_theme["button_add5"], btn_in_gap_width, self.gap_height, btn_add_five_xpos, self.troop_area_gap_ypos, "", btn_add5_id)
+            btn_add_one.drawButton(board.game_display, game_theme["button_add1"], btn_in_gap_width, self.gap_height, btn_add_one_xpos, self.troop_area_gap_ypos, "", btn_add1_id)
+            btn_rem_one.drawButton(board.game_display, game_theme["button_rem1"], btn_in_gap_width, self.gap_height, btn_rem_one_xpos, self.troop_area_gap_ypos, "", btn_rem1_id)
+            btn_rem_five.drawButton(board.game_display, game_theme["button_rem5"], btn_in_gap_width, self.gap_height, btn_rem_five_xpos, self.troop_area_gap_ypos, "", btn_rem5_id)
             top_troop_area_backing.drawArea(board.game_display, game_state["current_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.top_troop_area_xpos, self.top_troop_area_ypos, backing_text_p1)
             lower_troop_area_backing.drawArea(board.game_display, game_state["current_player"]["troop_area_background"], self.menu_width, self.troop_area_height, self.lower_troop_area_xpos, self.lower_troop_area_ypos, backing_text_p2)
             top_troop_area = TroopArea()
@@ -615,6 +664,9 @@ class SideMenuRight():
             player2_troop_area = TroopArea()
             player1_troop_area.drawTroopArea(board, game_state["current_player"], self.top_troop_area_xpos, self.top_troop_area_ypos)
             player2_troop_area.drawTroopArea(board, game_state["opposition_player"], self.lower_troop_area_xpos, self.lower_troop_area_ypos)
+    def drawMessageArea(self):
+        message_area = MessageArea()
+        message_area.drawMessageArea(board, self.message_area_xpos, self.message_area_ypos)
 
 class NodeGraphic():
     def __init__(self):
@@ -796,6 +848,7 @@ class PlayGame():
                     node_shape.node_network_name = node
                     node_shape.drawNode(board, player)
             board.side_menu_right.drawTroopAllocationArea(board, game_state)
+            board.side_menu_right.drawMessageArea()
             pygame.display.update()
         pygame.display.update()
 
