@@ -845,12 +845,12 @@ class PlayGame():
         game_state["current_player"] = self.current_player_data
         game_state["opposition_player"] = self.opposition_player_data
 
-        print(game_state["stage"])
-        game_state["stage"] = 3
-        board.mouse_selected_node = ""
-        board.mouse_selected_attack_node = ""
-        board.mouse_selected_launch_node = ""
-        board.possible_targets = []
+        # print(game_state["stage"])
+        # game_state["stage"] = 3
+        # board.mouse_selected_node = ""
+        # board.mouse_selected_attack_node = ""
+        # board.mouse_selected_launch_node = ""
+        # board.possible_targets = []
 
         self.loadBoardState(game_state)
         self.renderStage(game_state)
