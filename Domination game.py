@@ -537,7 +537,6 @@ class MessageArea():
         }
 
     def drawMessageArea(self, board, pos_x, pos_y):
-        print ('MessageArea', pos_x, pos_y, board.stage)
         self.message_area_width = board.side_menu_right.menu_width
         self.message_area_xpos = pos_x
         self.message_area_ypos = pos_y
