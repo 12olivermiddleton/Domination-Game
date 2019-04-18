@@ -826,6 +826,7 @@ class PlayGame():
 
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
         defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
+        print(attacking_army_size, defending_army_size)
 
         # dice roll generator
         def getDiceRollsFor(army_size):
@@ -895,6 +896,10 @@ class PlayGame():
         print("Executing ", game_state["stage"], " function")
         pass
 
+    def fortify(self, game_state):
+
+        for current_node in game_state["current_player"]["playerOccupied"]:
+           pass
 
 
     def playGame(self, game_state):
@@ -978,6 +983,8 @@ class PlayGame():
                                         game_state["opposition_player"]["selected_node_banner"] = ""
                                         board.mouse_selected_attack_node = ""
                                         board.possible_targets = self.nearestEnemiesOfNode(board.mouse_selected_launch_node)
+                                    elif board.stage == 3:
+                                        pass
 
                                     self.loadBoardState(game_state)
                                 else:
