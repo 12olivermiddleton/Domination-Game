@@ -48,7 +48,7 @@ theme_got = {
         "B": {"connections": ["A", "C", "D", "E"],
               "coords": [525, 225],
               "banner": "./theme_got/House-Stark-Main-Shield.png"},
-        "C": {"connections": ["B", "F"],
+        "C": {"connections": ["B", "D", "F"],
               "coords": [371, 473],
               "banner": "./theme_got/House-Greyjoy-Main-Shield.png"},
         "D": {"connections": ["B", "E", "F", "G", "C"],
@@ -859,7 +859,7 @@ class PlayGame():
             elif attacking_army_size == 1 and defending_army_size > attacking_army_size:
                 finished_fighting = True
             else:
-                # nobody defeated, roll dice again (recursion)
+                # nobody defeated, roll dice again
                 attacking_army_size, defending_army_size = compareDiceRolls(attacking_army_size, defending_army_size)
 
         # set result of battle to update display
@@ -871,7 +871,7 @@ class PlayGame():
             del self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
 
         else:
-            self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = 1
+            self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]] = attacking_army_size
             self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]] = defending_army_size
 
         self.current_player_data["selected_node"] = ""
