@@ -11,6 +11,7 @@ import time
 
 
 class Colour():
+    # a palette of colours
     red = pygame.Color(255, 0, 0)
     green = pygame.Color(0, 255, 0)
     blue = pygame.Color(0, 153, 255)
@@ -23,11 +24,13 @@ class Colour():
     dark_grey = pygame.Color(23, 26, 37)
 
 class SigilBanner():
+    # in case we need to change the banner size
     height= 50
     width = 45
 
 theme_got = {
     "id": "theme_got",
+    "new_game_btn_txt": "New GOT Game",
     "font": "./theme_got/MyDominationFont.ttf",
     "map_image": "./theme_got/GOT map 2.JPG",
     "map_width": 460,
@@ -76,79 +79,81 @@ theme_got = {
     "p1_occupied": ["A", "D", "E", "H", "I"],
     "p2_occupied": ["B", "C", "F", "G", "J"]
 }
-# theme_space = {
-#     "id": "theme_space",
-#     "font": "./theme_space/Deadspace.ttf",
-#     "map_image": "./theme_space/Space map.JPG",
-#     "map_width": 862,
-#     "map_height": 1019,
-#     "button_background": "./theme_space/orange_paper.jpg",
-#     "button_add1": "button_add1.png",
-#     "button_add5": "button_add5.png",
-#     "button_rem1": "button_remove1.png",
-#     "button_rem5": "button_remove5.png",
-#     "shield_p1": "./theme_space/Shield 2.fw.PNG",
-#     "shield_p2": "./theme_space/Shield 5.fw.PNG",
-#     "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
-#     "troop_area_image_p2": "./theme_got/background grassy 30pc.jpg",
-#     "network_graph": {
-#         "A": {"connections": ["B"],
-#               "coords": [414, 135],
-#               "banner": "./theme_space/alien 1.png"},
-#         "B": {"connections": ["A", "C", "L"],
-#               "coords": [473, 204],
-#               "banner": "./theme_space/alien 2.png"},
-#         "C": {"connections": ["B", "D"],
-#               "coords": [666, 105],
-#               "banner": "./theme_space/alien 3.png"},
-#         "D": {"connections": ["C", "F", "J"],
-#               "coords": [756, 247],
-#               "banner": "./theme_space/alien 4.png"},
-#         "E": {"connections": ["F"],
-#               "coords": [1044, 88],
-#               "banner": "./theme_space/alien 5.png"},
-#         "F": {"connections": ["E", "G"],
-#               "coords": [1095, 155],
-#               "banner": "./theme_space/alien 6.png"},
-#         "G": {"connections": ["F", "D", "H"],
-#               "coords": [1105, 219],
-#               "banner": "./theme_space/alien 7.png"},
-#         "H": {"connections": ["G", "I"],
-#               "coords": [1087, 276],
-#               "banner": "./theme_space/alien 8.png"},
-#         "I": {"connections": ["H", "J"],
-#               "coords": [1063, 394],
-#               "banner": "./theme_space/alien 9.png"},
-#         "J": {"connections": ["I"],
-#               "coords": [1014, 431],
-#               "banner": "./theme_space/alien 10.png"},
-#         "K": {"connections": ["D", "L", "O"],
-#               "coords": [697, 495],
-#               "banner": "./theme_space/alien 11.png"},
-#         "L": {"connections": ["K", "M"],
-#               "coords": [650, 536],
-#               "banner": "./theme_space/alien 12.png"},
-#         "M": {"connections": ["B", "L", "N"],
-#               "coords": [606, 568],
-#               "banner": "./theme_space/alien 13.png"},
-#         "N": {"connections": ["M", "O"],
-#               "coords": [540, 861],
-#               "banner": "./theme_space/alien 14.png"},
-#         "O": {"connections": ["K", "N"],
-#               "coords": [859, 807],
-#               "banner": "./theme_space/alien 15.png"}
-#     },
-#     "p1_occupied": ["A", "C", "E", "G", "I", "K", "M"],
-#     "p2_occupied": ["B", "D", "F", "H", "J", "L", "N", "O"]
-# }
+theme_space = {
+    "id": "theme_space",
+    "new_game_btn_txt": "New Space Game",
+    "font": "./theme_space/Deadspace.ttf",
+    "map_image": "./theme_space/Space map.JPG",
+    "map_width": 862,
+    "map_height": 1019,
+    "button_background": "./theme_space/orange_paper.jpg",
+    "button_add1": "button_add1.png",
+    "button_add5": "button_add5.png",
+    "button_rem1": "button_remove1.png",
+    "button_rem5": "button_remove5.png",
+    "shield_p1": "./theme_space/Shield 2.fw.PNG",
+    "shield_p2": "./theme_space/Shield 5.fw.PNG",
+    "troop_area_image_p1": "./theme_got/scroll compass map 30pc.jpg",
+    "troop_area_image_p2": "./theme_got/background grassy 30pc.jpg",
+    "network_graph": {
+        "A": {"connections": ["B"],
+              "coords": [414, 135],
+              "banner": "./theme_space/alien 1.png"},
+        "B": {"connections": ["A", "C", "L"],
+              "coords": [473, 204],
+              "banner": "./theme_space/alien 2.png"},
+        "C": {"connections": ["B", "D"],
+              "coords": [666, 105],
+              "banner": "./theme_space/alien 3.png"},
+        "D": {"connections": ["C", "F", "J"],
+              "coords": [756, 247],
+              "banner": "./theme_space/alien 4.png"},
+        "E": {"connections": ["F"],
+              "coords": [1044, 88],
+              "banner": "./theme_space/alien 5.png"},
+        "F": {"connections": ["E", "G"],
+              "coords": [1095, 155],
+              "banner": "./theme_space/alien 6.png"},
+        "G": {"connections": ["F", "D", "H"],
+              "coords": [1105, 219],
+              "banner": "./theme_space/alien 7.png"},
+        "H": {"connections": ["G", "I"],
+              "coords": [1087, 276],
+              "banner": "./theme_space/alien 8.png"},
+        "I": {"connections": ["H", "J"],
+              "coords": [1063, 394],
+              "banner": "./theme_space/alien 9.png"},
+        "J": {"connections": ["I"],
+              "coords": [1014, 431],
+              "banner": "./theme_space/alien 10.png"},
+        "K": {"connections": ["D", "L", "O"],
+              "coords": [697, 495],
+              "banner": "./theme_space/alien 11.png"},
+        "L": {"connections": ["K", "M"],
+              "coords": [650, 536],
+              "banner": "./theme_space/alien 12.png"},
+        "M": {"connections": ["B", "L", "N"],
+              "coords": [606, 568],
+              "banner": "./theme_space/alien 13.png"},
+        "N": {"connections": ["M", "O"],
+              "coords": [540, 861],
+              "banner": "./theme_space/alien 14.png"},
+        "O": {"connections": ["K", "N"],
+              "coords": [859, 807],
+              "banner": "./theme_space/alien 15.png"}
+    },
+    "p1_occupied": ["A", "C", "E", "G", "I", "K", "M"],
+    "p2_occupied": ["B", "D", "F", "H", "J", "L", "N", "O"]
+}
 
-# default theme
+# default theme is G.O.T
+# Uncomment theme_space for an spacey easter egg
 game_theme = theme_got
+# game_theme = theme_space
 
-def setTheme(new_theme):
-    game_theme = new_theme
 
 class CustomFont():
+    # default font settings
     def __init__(self):
         pygame.font.init()
         domination_font = game_theme["font"]
@@ -161,68 +166,55 @@ class CustomFont():
 
 
 class PlayLoadGameMenu():
+    # An initial load menu to set up new game
     def __init__(self):
-
+        # Empty button list
         self.button_list = []
+
+        # Display size
         self.display_width = 600
         self.display_height = 600
+        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
+
+        # Grab the font for this game theme
         domination_font = CustomFont()
 
-        self.game_display = pygame.display.set_mode((self.display_width, self.display_height))
+        # Heading and background
         pygame.display.set_caption('Menu')
         self.game_display.fill(Colour.dark_grey)
-
         text_surface = domination_font.splash_title.render("Domination", False, Colour.white)
         self.game_display.blit(text_surface, (110, 50))
 
-        x = 120
-        y = 220
-        text_pos_x = 130
+        # Button and button text positions
+        btn_indent_x = 120
+        btn_indent_y = 220
+        text_indent_x = btn_indent_x + 10
         button_text_no = 0
 
-        # An initial array of identical buttons
+        # Paint some details onto an array of identical buttons
         for i in range(3):
             button_text_no = button_text_no + 1
-            text_pos_y = y + 20
-            self.button_list.append(Button(x, y, self.game_display))
+            text_pos_y = btn_indent_y + 20
+            self.button_list.append(Button(btn_indent_x, btn_indent_y, self.game_display))
 
             if button_text_no == 1:
-                text_surface = domination_font.splash_button.render("New GOT Game", False, Colour.white)
-                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
-
-            # elif button_text_no == 2:
-            #     text_surface = domination_font.splash_button.render("New Space Game", False, Colour.white)
-            #     self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
+                text_surface = domination_font.splash_button.render(game_theme["new_game_btn_txt"], False, Colour.white)
+                self.game_display.blit(text_surface, (text_indent_x, text_pos_y))
 
             elif button_text_no == 2:
                 text_surface = domination_font.splash_button.render("Load Game", False, Colour.white)
-                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
+                self.game_display.blit(text_surface, (text_indent_x, text_pos_y))
 
             elif button_text_no == 3:
                 text_surface = domination_font.splash_button.render("Instructions", False, Colour.white)
-                self.game_display.blit(text_surface, (text_pos_x, text_pos_y))
+                self.game_display.blit(text_surface, (text_indent_x, text_pos_y))
 
-            y = y + 100
+            # offset each button vertically
+            btn_indent_y = btn_indent_y + 100
             pygame.display.update()
 
     def getButtonList(self):
         return self.button_list
-
-
-class Instructions():
-    def __init__(self):
-        self.instructionsDisplay_width = 600
-        self.instructionsDisplay_height = 700
-        self.instructionsPanel()
-
-    def instructionsPanel(self):
-        game_display = pygame.display.set_mode((self.instructionsDisplay_width, self.instructionsDisplay_height))
-        pygame.display.set_caption('Instructions')
-        game_display.fill(Colour.pink)
-
-        # This is a test to see if the game display window works
-        # pygame.draw.rect(game_display, colour.red, (100,100,100,100))
-
 
 class Graphic():
     def __init__(self, x, y):
@@ -254,18 +246,19 @@ class Icon(Graphic):
         self.node = node
         self.shield = shield
 
-
+# Work out the button width vs the text width and pad to the left with half that space to centre justify (horizontally)
 def centreJustifyButton(button_xpos, button_width, text_object):
     return button_xpos + round((button_width - text_object.get_width()) / 2)
 
-
+# Work out the button height vs the text height and pad to the top with half that space to centre justify (vertically)
 def verticalJustifyButton(button_ypos, button_height, text_object):
     return button_ypos + round((button_height - text_object.get_height()) / 2)
 
-
+# Keep track of buttons that are in play and ones not to be shown
 game_buttons = {}
 
 
+# Methods for altering the buttons in play
 def setButtonState(operation, button_id, button):
     if operation == "add":
         # add a button to the dictionary of buttons
@@ -275,11 +268,11 @@ def setButtonState(operation, button_id, button):
         # remove a button from the array of buttons
         game_buttons.pop(button_id, None)
 
-
 def getButtonState():
     return game_buttons
 
 
+# A nice paper background button from the theme, stretchable to any dimension
 class PaperButton():
     def __init__(self):
         # defaults
@@ -298,6 +291,7 @@ class PaperButton():
         self.button_id = btn_id
         self.button_rectangle = self.picture.get_rect()
         self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
+        # domination font only works with alpha characters - default to a system font as needed
         if all(char.isalpha() for char in str(btn_text)):
             btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
         else:
@@ -309,8 +303,9 @@ class PaperButton():
         btn_label_x = centreJustifyButton(self.button_rectangle.x, self.button_rectangle.width, btn_label)
         btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
         surface.blit(btn_label, (btn_label_x, btn_label_y))
-        setButtonState("add", btn_id, self.button_rectangle)  #used to add and remove buttons from view
+        setButtonState("add", btn_id, self.button_rectangle)  # add this button to the view
 
+# A nice paper background for the Troop Area from the theme
 class PaperTroopArea():
     def __init__(self):
         # defaults
@@ -328,6 +323,7 @@ class PaperTroopArea():
         self.picture = pygame.transform.scale(self.picture, (btn_width, btn_height))
         self.button_rectangle = self.picture.get_rect()
         self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
+        # guard against strings that do not have all alpha characters - default to a system font as needed
         if any(char.isalpha() for char in str(btn_text)):
             btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
         else:
@@ -340,17 +336,28 @@ class PaperTroopArea():
         btn_label_y = verticalJustifyButton(self.button_rectangle.y, self.button_rectangle.height, btn_label)
         surface.blit(btn_label, (btn_label_x, btn_label_y))
 
+# The Left side-menu
 class SideMenuLeft():
-    # relative sizing for buttons and menus
-
     def __init__(self):
 
         # Menu Container
         self.menu_width = 330
         self.x_pos_menu_container = 0
         self.y_pos_menu_container = 0
+        self.status_colour = Colour.white
+        self.text_on_paper = Colour.black
+        self.current_colour = Colour.red
+        self.stage_colour = Colour.black
 
-        # Stage (split into 3 buttons with 1 pixel divider)
+        # Menu buttons
+        self.x_pos_menu_buttons_container_indent = 20
+        self.y_pos_menu_buttons_container_top = 150
+        self.menu_button_height = 75
+        self.menu_button_vertical_gap = 25
+        self.menu_button_width = self.menu_width - 2 * self.x_pos_menu_buttons_container_indent  # pad either side
+        self.menu_button_vertical_spacing = self.menu_button_height + self.menu_button_vertical_gap
+
+        # Stage Indicator (is it Allocate, Attack or Fortify?)
         self.y_pos_stage_menu = 876
         self.stage_button_width = round(self.menu_width / 3) - 1
         self.stage_height = 75
@@ -358,23 +365,18 @@ class SideMenuLeft():
         self.x_pos_stage_attack = round(self.menu_width/3)
         self.x_pos_stage_fortify = round(self.menu_width/3)*2
 
-        self.status_colour = Colour.white
-        self.text_on_paper = Colour.black
-        self.current_colour = Colour.red
-        self.stage_colour = Colour.black
-
+        # Overall height
         self.menu_container_height = self.y_pos_stage_menu + self.stage_height
 
-        # Menu buttons
-        self.x_pos_menu_buttons_container_indent = 20
-        self.y_pos_menu_buttons_container_top = 150
-        self.menu_button_height = 75
-        self.menu_button_vertical_gap = 25
-        self.menu_button_width = self.menu_width - 2 * self.x_pos_menu_buttons_container_indent # pad either side
-        self.menu_button_vertical_spacing = self.menu_button_height + self.menu_button_vertical_gap
-
     def drawItems(self, surface, stage):  # example of method overloading
-        # side menu left buttons
+        # Draw the left side-menu header
+        domination_font = CustomFont()
+        header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
+        header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
+        surface.blit(header_text1, (centreJustifyButton(self.x_pos_menu_buttons_container_indent, self.menu_button_width, header_text1), 5))
+        surface.blit(header_text2, (centreJustifyButton(self.x_pos_menu_buttons_container_indent, self.menu_button_width, header_text2), 75))
+
+        # Draw the left side-menu action buttons "Save", "Info" and "quit"
         btn_background = game_theme["button_background"]
         btn_save = PaperButton()
         btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save", "save")
@@ -383,22 +385,15 @@ class SideMenuLeft():
         btn_quit = PaperButton()
         btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quit")
 
-        # side menu left stages buttons
+        # Draw the left side-menu stage indicators...
         pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_allocate, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
-
-        domination_font = CustomFont()
-        header_text1 = domination_font.menu_heading.render("Domination", False, Colour.white)
-        header_text2 = domination_font.menu_button.render("Menu", False, Colour.white)
-        surface.blit(header_text1, (centreJustifyButton(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text1), 5))
-        surface.blit(header_text2, (centreJustifyButton(self.x_pos_menu_buttons_container_indent,self.menu_button_width, header_text2), 75))
-        
         stage_text = domination_font.menu_title.render("Stage", False, Colour.white)
         surface.blit(stage_text, (centreJustifyButton(self.x_pos_menu_buttons_container_indent, self.menu_button_width, stage_text), 825))
-
         allocation_text = domination_font.menu_action.render("Allocate", False, self.stage_colour)
         attack_text = domination_font.menu_action.render("Attack", False, self.stage_colour)
         fortify_text = domination_font.menu_action.render("Fortify", False, self.stage_colour)
 
+        # ...depending on the game stage
         pygame.draw.rect(surface, Colour.dark_grey, (self.x_pos_stage_attack, self.y_pos_stage_menu, self.menu_width, self.stage_height))
         if stage >= 0:
             surface.blit(allocation_text, (centreJustifyButton(self.x_pos_stage_allocate, self.stage_button_width, allocation_text), 890))
@@ -408,7 +403,8 @@ class SideMenuLeft():
         if stage > 2:
             pygame.draw.rect(surface, self.status_colour, (self.x_pos_stage_fortify, self.y_pos_stage_menu, self.stage_button_width, self.stage_height))
             surface.blit(fortify_text,(centreJustifyButton(self.x_pos_stage_fortify, self.stage_button_width, fortify_text), 890))
-        # border lines for side menu
+
+        # finally, the border lines for left side-menu
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.menu_width, self.y_pos_menu_container), 3)  # across top
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.menu_container_height), (self.menu_width, self.menu_container_height), 3)  # across bottom
         pygame.draw.line(surface, Colour.white, (self.x_pos_menu_container, self.y_pos_menu_container), (self.x_pos_menu_container, self.menu_container_height), 3)  # down left side
@@ -416,6 +412,7 @@ class SideMenuLeft():
 
         pygame.display.update()
 
+# A class to control the troop area display. Whose troops, count in/out, sigil flags for local factions etc.
 class TroopArea():
     def __init__(self):
         self.domination_font = CustomFont()
@@ -457,13 +454,13 @@ class TroopArea():
         player_text = self.domination_font.menu_button.render(player["display_name"], False, self.text_on_troop_area)
         board.game_display.blit(player_text, (self.troop_area_xpos + self.shield_square_width, self.troop_area_ypos))
 
-        ## Troop Stack
+        ## Troop Stack (show up to 32 troops). Get the images from the game theme
         if player["selected_node"] != "":
-
+            max_renderable_armies = 32
             armies_at_this_node = player["troops_at_node"][player["selected_node"]]
             army_count_text_size = round(self.sigil_height / 1.5)
             army_count_font = pygame.font.SysFont("Comic Sans MS", army_count_text_size)
-            max_renderable_armies = 32
+
             army_display_spaces = min(max_renderable_armies, armies_at_this_node)  # don't render more than 32 armies
             army_count_display = str(armies_at_this_node)
 
@@ -485,7 +482,7 @@ class TroopArea():
                         sigil_xpos = pos_x + (army_index - self.army_index_new_row) * sigil_xpos_spacer
                         sigil_ypos = pos_y + self.shield_square_height + + self.sigil_spacer + self.army_index_row * sigil_ypos_spacer
 
-                    # dray army item
+                    # draw army item
                     sigil_rectangle = players_launch_army_img.get_rect()
                     sigil_rectangle = sigil_rectangle.move(sigil_xpos, sigil_ypos)
                     board.game_display.blit(players_launch_army_img, sigil_rectangle)
@@ -501,13 +498,17 @@ class TroopArea():
         if board.stage in [0, 1, 3]:
             btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
             btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
-            btn_id = "confirm"
+            if board.stage == 0 or board.stage == 1:
+                btn_suffix = "Allocate"
+            elif board.stage == 3:
+                btn_suffix = "Fortify"
+            btn_id = "confirm_" + btn_suffix
             if player["unallocated_troops"] == 0:
                 if player["display_name"] == "Available Troops":
                     btn_confirm = PaperButton()
-                    btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, "Confirm", btn_id)
+                    btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, btn_suffix, btn_id)
 
-
+# The Right side-menu
 class SideMenuRight():
     def __init__(self, menu_xpos, menu_ypos, menu_height):
 
@@ -533,7 +534,6 @@ class SideMenuRight():
         self.player_troop_banner_width = 100
         self.player_troop_banner_height = 100
         self.troop_area_gap_height = 60
-
         self.top_troop_area_xpos = self.menu_xpos + troop_area_indent_from_left
         self.top_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top
         self.troop_area_gap_xpos = self.menu_xpos + troop_area_indent_from_left
@@ -542,11 +542,14 @@ class SideMenuRight():
         self.lower_troop_area_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
         self.lower_troop_banner_xpos = self.menu_xpos + troop_area_indent_from_left
         self.lower_troop_banner_ypos = self.menu_ypos + troop_area_indent_from_top + self.troop_area_height + self.troop_area_gap_height
+
+        # Attack Button
         self.btn_attack_xpos = self.menu_xpos + troop_area_indent_from_left
         self.btn_attack_ypos = self.menu_ypos + troop_area_indent_from_top + 2 * self.troop_area_height + self.troop_area_gap_height
         self.btn_attack_height = 60
         self.btn_attack_background = game_theme["button_background"]
 
+    # A method to display the appropriate text at the right stage.
     def drawItems(self, surface, stage):
         domination_font = CustomFont()
         stage_texts = ["Allocate troops", "Allocate troops", "Prepare the Attack", "Fortify"]
@@ -563,13 +566,14 @@ class SideMenuRight():
         header_text1 = domination_font.menu_heading.render(stage_text, False, Colour.white)
         surface.blit(header_text1, (centreJustifyButton(self.menu_xpos, self.menu_width, header_text1), 5))
 
+    # A method to render the appropriate troop area disposition (with controls to add 1 to 5 troops or remove 1 to 5 troops)
     def drawTroopAllocationArea(self, board, game_state):
         top_troop_area_backing = PaperTroopArea()
         lower_troop_area_backing = PaperTroopArea()
         backing_text_p1 = ""
         backing_text_p2 = ""
         if board.stage in[0, 1, 3]:
-            # ADD REMOVE troops Controls
+            # ADD/REMOVE troops Controls
             # Putting troops on the bench if they are unallocated.
             bench_state = copy.deepcopy(game_state["current_player"])
             bench_state["display_name"] = "Available Troops"
@@ -657,6 +661,7 @@ class NodeGraphic():
         text_surface = myfont.render(str(player["troops_at_node"][self.node_network_name]), False, Colour.white)
         board.game_display.blit(text_surface, (centreJustifyButton(self.pos_x, self.width, text_surface), self.pos_y + round(self.height / 2)))
 
+# The board class renders the map and the board.
 class Board():
     def __init__(self):
 
@@ -735,6 +740,7 @@ class Board():
 
         return self
 
+# The main routine iterated by the changes to the game state and updating the board
 class PlayGame():
     def __init__(self, board):
 
@@ -755,7 +761,6 @@ class PlayGame():
         board.renderLayout()
 
 
-
     def saveGame(self, game_state):
         print('Save:', game_state)
         with open('test_pickle.pkl', 'wb') as pickle_out:
@@ -764,21 +769,17 @@ class PlayGame():
     def quitGame(self):
         pygame.quit()
 
-    def allocationStage(self, game_state):
-        #
-        count = 0
-        print ("this is the allocation of your troops", game_state)
-        #implementing breadth first search for nodes around the users current nodes for troop allocation
-        # Traversing the network graph to find neighbouring nodes
-        for current_node in game_state["current_player"]["playerOccupied"]:
-            #print("this is the node in the allocation stage", node)
-            current_vertex_list = self.network_graph[current_node]
-            #print (current_vertex_list)
-            for vertex in current_vertex_list:
-                count = count + 1
-        print ("the number of troopps that the player will receive is", count)
-        NoOfTroops = count
+    # def allocationStage(self, game_state):
+    #     count = 0
+    #     #implementing breadth first search for nodes around the users current nodes for troop allocation
+    #     # Traversing the network graph to find neighbouring nodes
+    #     for current_node in game_state["current_player"]["playerOccupied"]:
+    #         current_vertex_list = self.network_graph[current_node]
+    #         for vertex in current_vertex_list:
+    #             count = count + 1
+    #     NoOfTroops = count
 
+    # A method to refresh the board from an initial, save or in-progress game state
     def loadBoardState(self, game_state):
         board.DisplayMap(game_state["game_theme"])
         player1 = game_state["current_player"]
@@ -799,11 +800,7 @@ class PlayGame():
             pygame.display.update()
         pygame.display.update()
 
-    def makeMove(self):
-        pass
-
     def nearestEnemiesOfNode(self, node):
-
         # search to find the neighbours of a node
         # find the neighbours which are enemies
         neighbours = self.network_graph[node]["connections"]
@@ -821,7 +818,7 @@ class PlayGame():
         # need player 1 vs player 2
         # need to find selected nodes
         # get number of troops on each node
-        # randomly work out which army wins
+        # use considered randomness to work out which army wins (give each army a dice roll to fight with)
         # get army sizes
 
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
@@ -851,6 +848,7 @@ class PlayGame():
 
             return attacking_size, defending_size
 
+        # Iterate until the battles are all won or lost
         finished_fighting = False
         while not finished_fighting:
             # spot the defeat conditions
@@ -881,6 +879,7 @@ class PlayGame():
         game_state["current_player"] = self.current_player_data
         game_state["opposition_player"] = self.opposition_player_data
 
+        # After attack, set up for the next stage 3 "fortify"
         game_state["stage"] = 3
         board.mouse_selected_node = ""
         board.mouse_selected_attack_node = ""
@@ -890,18 +889,14 @@ class PlayGame():
         self.loadBoardState(game_state)
         self.renderStage(game_state)
 
+    # update the side menus if required
     def renderStage(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         self.side_menu_right.drawItems(board.game_display, game_state["stage"])
         print("Executing ", game_state["stage"], " function")
         pass
 
-    def fortify(self, game_state):
-
-        for current_node in game_state["current_player"]["playerOccupied"]:
-           pass
-
-
+    # The main play game method, executing mouse and keyboard inputs
     def playGame(self, game_state):
 
         self.current_player_data = game_state["current_player"]
@@ -912,19 +907,15 @@ class PlayGame():
         board.player_turn = game_state["current_player"]
         board.theme = game_state["game_theme"]
 
-        if board.stage == 0:
-            print("confirmed stage of allocate initial board!")
-            self.allocationStage(game_state)
+        if board.stage == 0:  # Initial
+            # self.allocationStage(game_state)
             self.renderStage(game_state)
-        if board.stage == 1:
-            print("confirmed stage of allocate!")
-            self.allocationStage(game_state)
+        if board.stage == 1:  # Allocate
+            # self.allocationStage(game_state)
             self.renderStage(game_state)
-        elif board.stage == 2:
-            print("confirmed stage of attack!")
+        elif board.stage == 2:  # Attack
             self.renderStage(game_state)
-        elif board.stage == 3:
-            print("confirm stage of fortify!")
+        elif board.stage == 3:  # Fortify
             self.renderStage(game_state)
 
         self.loadBoardState(game_state)
@@ -934,7 +925,6 @@ class PlayGame():
                     pygame.quit()
                     quit()
                     self.crashed = True
-                mouse = pygame.mouse.get_pos()
                 #######################
                 ##### MOUSE CLICKED ###
                 #######################
@@ -951,11 +941,9 @@ class PlayGame():
                                         # the launch node is present ..
                                         if icon.node in board.possible_targets:
                                             # and the enemy is reachable from the node
-                                            print("Enemy selected", icon.node)
                                             board.mouse_selected_attack_node = icon.node
                                             game_state["opposition_player"]["selected_node"] = icon.node
                                             game_state["opposition_player"]["selected_node_banner"] = self.network_graph[icon.node]["banner"]
-                                            print(game_state["opposition_player"]["selected_node_banner"])
                                             self.loadBoardState(game_state)
                                     else:
                                         # the launch node was missing
@@ -998,7 +986,7 @@ class PlayGame():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
                             # Allocate  - first board setup
                             if board.stage <= 1:
-                                if button == ("confirm"):
+                                if button == ("confirm_Allocate"):
                                     # Proceed to next player or next stage
                                     self.current_player_data["selected_node"] = ""
                                     self.current_player_data["selected_node_banner"] = ""
@@ -1022,9 +1010,10 @@ class PlayGame():
 
                             # Fortify
                             if board.stage == 3:
+                                print ("biutt", button)
                                 if board.mouse_selected_node != "":
                                     troopAllocate(board, game_state, button)
-                                if button == "confirm":
+                                if button == "confirm_Fortify":
                                     self.current_player_data["selected_node"] = ""
                                     self.current_player_data["selected_node_banner"] = ""
                                     board.mouse_selected_node = ""
@@ -1043,8 +1032,6 @@ class PlayGame():
 
                 elif event.type == pygame.KEYDOWN:
                     if board.mouse_selected_node:
-                        print("selected node: " + board.mouse_selected_node)
-
                         if event.key == pygame.K_UP:
                             if board.stage <= 1:
                                 if self.current_player_data["unallocated_troops"] > 0:
@@ -1055,11 +1042,10 @@ class PlayGame():
                                 if self.current_player_data["troops_at_node"][board.mouse_selected_node] > 1:
                                     troopAllocate(board, game_state, "rem1")
                         self.loadBoardState(game_state)
-                    else:
-                        print("no mouse selected node!" + board.mouse_selected_node)
+                    else:  # no mouse selected node!
+                        pass
 
 def troopAllocate(board, game_state, button):
-    print (button, game_state["current_player"], board.mouse_selected_node)
     def moveTroops(troops):
         game_state["current_player"]["unallocated_troops"] = game_state["current_player"]["unallocated_troops"] - troops
         game_state["current_player"]["troops_at_node"][board.mouse_selected_node] = game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + troops
@@ -1143,7 +1129,6 @@ def newGame(board):
 def loadGame(board):
     with open('test_pickle.pkl', 'rb') as pickle_in:
         game_data = pickle.load(pickle_in)
-        print('load', game_data)
         game_theme = game_data["game_theme"]
         board.theme = game_theme
         board.board_width = game_theme["map_width"]
@@ -1163,11 +1148,9 @@ if __name__ == "__main__":
     # board = Board()
     clock = pygame.time.Clock()
     mouse = pygame.mouse.get_pos()
-    # print(mouse)
     crashed = False
     while not crashed:
         for event in pygame.event.get():
-            # print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -1178,7 +1161,6 @@ if __name__ == "__main__":
                 button_min_y = 220
                 button_max_y = 295
                 mouse = pygame.mouse.get_pos()
-                print(mouse)
                 button_found = False
                 button_number = 0
                 # sort out the button numbers, use iterative statements to define the button number// which button was pressed
@@ -1192,27 +1174,15 @@ if __name__ == "__main__":
                         if button_number == 1:
                             # NEW Game
                             pygame.quit()
-                            game_theme = theme_got
                             board = Board()
                             play = PlayGame(board)
                             newGame(board)
-                        # elif button_number == 2:
-                        #     # NEW Game
-                        #     pygame.quit()
-                        #     game_theme = theme_space
-                        #     board = Board()
-                        #     play = PlayGame(board)
-                        #     newGame(board)
-                        elif button_number == 3:
+                        elif button_number == 2:
                             # LOAD Game
                             pygame.quit()
                             board = Board()
                             loadGame(board)
                             pass
-                        elif button_number == 4:
-                            pygame.quit()
-                            instructions = Instructions()
-                            pygame.display.update()
                     else:
                         button_min_y = button_min_y + 100
                         button_max_y = button_max_y + 100
