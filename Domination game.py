@@ -808,10 +808,6 @@ class PlayGame():
         for neighbour in neighbours:
             if neighbour in self.opposition_player_data["playerOccupied"]:
                 enemy_neighbours.append(neighbour)
-
-        print("the node", node )
-        print("the neighbours", neighbours)
-        print("the neighbours that are enemies", enemy_neighbours)
         return enemy_neighbours
 
     def fight(self, game_state):
@@ -823,7 +819,6 @@ class PlayGame():
 
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
         defending_army_size = self.opposition_player_data["troops_at_node"][self.opposition_player_data["selected_node"]]
-        print(attacking_army_size, defending_army_size)
 
         # dice roll generator
         def getDiceRollsFor(army_size):
@@ -893,8 +888,6 @@ class PlayGame():
     def renderStage(self, game_state):
         self.side_menu_left.drawItems(board.game_display, game_state["stage"])
         self.side_menu_right.drawItems(board.game_display, game_state["stage"])
-        print("Executing ", game_state["stage"], " function")
-        pass
 
     # The main play game method, executing mouse and keyboard inputs
     def playGame(self, game_state):
