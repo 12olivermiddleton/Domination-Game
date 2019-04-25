@@ -769,15 +769,15 @@ class PlayGame():
     def quitGame(self):
         pygame.quit()
 
-    # def allocationStage(self, game_state):
-    #     count = 0
-    #     #implementing breadth first search for nodes around the users current nodes for troop allocation
-    #     # Traversing the network graph to find neighbouring nodes
-    #     for current_node in game_state["current_player"]["playerOccupied"]:
-    #         current_vertex_list = self.network_graph[current_node]
-    #         for vertex in current_vertex_list:
-    #             count = count + 1
-    #     NoOfTroops = count
+    def allocationStage(self, game_state):
+        count = 0
+        #implementing breadth first search for nodes around the users current nodes for troop allocation
+        # Traversing the network graph to find neighbouring nodes
+        for current_node in game_state["current_player"]["playerOccupied"]:
+            current_vertex_list = self.network_graph[current_node]
+            for vertex in current_vertex_list:
+                count = count + 1
+        NoOfTroops = count
 
     # A method to refresh the board from an initial, save or in-progress game state
     def loadBoardState(self, game_state):
@@ -811,10 +811,9 @@ class PlayGame():
         return enemy_neighbours
 
     def fight(self, game_state):
-        # need player 1 vs player 2
-        # need to find selected nodes
+        # player 1 vs player 2 - find selected nodes
         # get number of troops on each node
-        # use considered randomness to work out which army wins (give each army a dice roll to fight with)
+        # use random dice to work out which army wins (give each army a dice roll to fight with)
         # get army sizes
 
         attacking_army_size = self.current_player_data["troops_at_node"][self.current_player_data["selected_node"]]
@@ -977,7 +976,7 @@ class PlayGame():
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
-                            # Allocate  - first board setup
+                            # Allocate stage - incl first board setup
                             if board.stage <= 1:
                                 if button == ("confirm"):
                                     # Proceed to next player or next stage
@@ -985,17 +984,18 @@ class PlayGame():
                                     self.current_player_data["selected_node_banner"] = ""
                                     board.mouse_selected_node = ""
                                     if board.stage == 0:
+                                        # The very first iteration is just for each player to allocate troops.
                                         game_state["opposition_player"] = self.current_player_data
                                         game_state["current_player"] = self.opposition_player_data
                                         if self.current_player_data["id"] == "p2":
                                             game_state["stage"] = 2
-
-                                    if board.stage == 1:
+                                    elif board.stage == 1:
+                                        # Every round this happens
                                         game_state["stage"] = 2
                                 troopAllocate(board, game_state, button)
                                 self.playGame(game_state)
 
-                            # Attack
+                            # Attack stage
                             if board.stage == 2:
                                 if button == "attack":
                                     self.fight(game_state)
@@ -1021,7 +1021,7 @@ class PlayGame():
                             # Quit Game
                             if button == "quit":
                                 self.quitGame()
-
+                # also support up/down keys for add/remove troops
                 elif event.type == pygame.KEYDOWN:
                     if board.mouse_selected_node:
                         if event.key == pygame.K_UP:
@@ -1034,29 +1034,34 @@ class PlayGame():
                                 if self.current_player_data["troops_at_node"][board.mouse_selected_node] > 1:
                                     troopAllocate(board, game_state, "rem1")
                         self.loadBoardState(game_state)
-                    else:  # no mouse selected node!
+                    else:  # no selected node!
                         pass
 
+# Allows movement of troops around the board - to and from "the bench" during the allocate and fortify stages
 def troopAllocate(board, game_state, button):
     def moveTroops(troops):
         game_state["current_player"]["unallocated_troops"] = game_state["current_player"]["unallocated_troops"] - troops
         game_state["current_player"]["troops_at_node"][board.mouse_selected_node] = game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + troops
-
+    # Add up to 5 troops to the army
     if button == "add5":
         if game_state["current_player"]["unallocated_troops"] >= 5:
-            moveTroops(5)  # Allocate 5
+            moveTroops(5)
         else:
             moveTroops(game_state["current_player"]["unallocated_troops"])  # Allocate whatever is left
+    # Add one troop to the army
     elif button == "add1" and game_state["current_player"]["unallocated_troops"] > 0:
-        moveTroops(1)  # Allocate 1
+        moveTroops(1)
+    # Remove one troop from the army
     elif button == "rem1" and game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 1:
-        moveTroops(-1)  # Bench 1
+        moveTroops(-1)
+    # Remove up to 5 troops from the army
     elif button == "rem5":
         if game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 5:
-            moveTroops(-5)  # Bench 5
+            moveTroops(-5)
         else:
             moveTroops(0 - game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + 1)  # Bench all but one troop
 
+# Disperse the players unallocated troops randomly over the bases
 def initialTroopDeployment(player):
     while player["unallocated_troops"] > 0:
         random_min = 1
@@ -1118,6 +1123,7 @@ def newGame(board):
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
 
+# Load a saved game from file
 def loadGame(board):
     with open('test_pickle.pkl', 'rb') as pickle_in:
         game_data = pickle.load(pickle_in)
@@ -1134,10 +1140,6 @@ if __name__ == "__main__":
     pygame.init()
     colour = Colour()
     menu = PlayLoadGameMenu()
-    # icons = Icons()
-    # changes in order to test objectifying the rectangle A
-
-    # board = Board()
     clock = pygame.time.Clock()
     mouse = pygame.mouse.get_pos()
     crashed = False
@@ -1178,7 +1180,5 @@ if __name__ == "__main__":
                     else:
                         button_min_y = button_min_y + 100
                         button_max_y = button_max_y + 100
-    # pygame.draw.rect(menu.gameDisplay,colour.red, (self.x,self.y,self.width,self.height))
-
     pygame.display.update()
     clock.tick(60)
