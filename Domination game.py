@@ -494,19 +494,19 @@ class TroopArea():
                         army_count_surface = army_count_font.render(army_count_display, False, Colour.black)
                         board.game_display.blit(army_count_surface, (sigil_xpos + sigil_xpos_spacer, sigil_ypos))
 
-        ## Confirm Allocate Button
+        ## Confirm  Button
+        btn_id = "confirm"
         if board.stage in [0, 1, 3]:
             btn_confirm_xpos = self.troop_area_xpos + board.side_menu_right.menu_width - self.btn_confirm_width
             btn_confirm_ypos = self.troop_area_ypos + self.troop_area_height - self.btn_confirm_height
             if board.stage == 0 or board.stage == 1:
-                btn_suffix = "Allocate"
+                btn_title = "Allocate"
             elif board.stage == 3:
-                btn_suffix = "Fortify"
-            btn_id = "confirm_" + btn_suffix
+                btn_title = "Fortify"
             if player["unallocated_troops"] == 0:
                 if player["display_name"] == "Available Troops":
                     btn_confirm = PaperButton()
-                    btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, btn_suffix, btn_id)
+                    btn_confirm.drawButton(board.game_display, self.btn_confirm_background, self.btn_confirm_width, self.btn_confirm_height, btn_confirm_xpos, btn_confirm_ypos, btn_title, btn_id)
 
 # The Right side-menu
 class SideMenuRight():
@@ -986,7 +986,7 @@ class PlayGame():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
                             # Allocate  - first board setup
                             if board.stage <= 1:
-                                if button == ("confirm_Allocate"):
+                                if button == ("confirm"):
                                     # Proceed to next player or next stage
                                     self.current_player_data["selected_node"] = ""
                                     self.current_player_data["selected_node_banner"] = ""
@@ -1010,10 +1010,9 @@ class PlayGame():
 
                             # Fortify
                             if board.stage == 3:
-                                print ("biutt", button)
                                 if board.mouse_selected_node != "":
                                     troopAllocate(board, game_state, button)
-                                if button == "confirm_Fortify":
+                                if button == "confirm":
                                     self.current_player_data["selected_node"] = ""
                                     self.current_player_data["selected_node_banner"] = ""
                                     board.mouse_selected_node = ""
