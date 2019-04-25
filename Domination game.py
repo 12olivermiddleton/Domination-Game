@@ -7,6 +7,7 @@ import pygame
 import pickle
 import random
 import copy
+import re
 import time
 
 
@@ -272,6 +273,20 @@ def getButtonState():
     return game_buttons
 
 
+show_message_area = {
+    "text": "Hide Info",
+    "visibility": True
+}
+
+def getMessageAreaVisible():
+    return show_message_area
+
+
+def setMessageAreaVisible(text, visibility):
+    show_message_area["text"] = text
+    show_message_area["visibility"] = visibility
+
+
 # A nice paper background button from the theme, stretchable to any dimension
 class PaperButton():
     def __init__(self):
@@ -291,8 +306,8 @@ class PaperButton():
         self.button_id = btn_id
         self.button_rectangle = self.picture.get_rect()
         self.button_rectangle = self.button_rectangle.move(btn_x, btn_y)
-        # domination font only works with alpha characters - default to a system font as needed
-        if all(char.isalpha() for char in str(btn_text)):
+        # domination font only works with alpha characters and spaces - default to a system font as needed
+        if re.sub('[\s+]', '', btn_text).isalpha():
             btn_label = self.domination_font.menu_button.render(btn_text, False, self.text_on_paper)
         else:
             myfont = pygame.font.SysFont("Comic Sans MS", 20)
@@ -381,7 +396,7 @@ class SideMenuLeft():
         btn_save = PaperButton()
         btn_save.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top, "Save", "save")
         btn_info = PaperButton()
-        btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, "Info", "info")
+        btn_info.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + self.menu_button_vertical_spacing, show_message_area["text"], "info")
         btn_quit = PaperButton()
         btn_quit.drawButton(surface, btn_background, self.menu_button_width, self.menu_button_height, self.x_pos_menu_buttons_container_indent, self.y_pos_menu_buttons_container_top + 2 * self.menu_button_vertical_spacing, "Quit", "quit")
 
@@ -543,13 +558,15 @@ class MessageArea():
         self.message_area_ypos = pos_y
         message_paragraph = self.messages[board.stage]
         myfont = pygame.font.SysFont("Comic Sans MS", self.messages["font_size"])
-
-        pygame.draw.rect(board.game_display, Colour.white,(self.message_area_xpos, self.message_area_ypos, self.message_area_width, self.message_area_height))
-        line_count = 0
-        for line in message_paragraph:
-            message_text = myfont.render(line, False, Colour.black)
-            board.game_display.blit(message_text, (self.message_area_xpos + self.message_area_indent_test, self.message_area_ypos + line_count * myfont.get_height()))
-            line_count = line_count + 1
+        if getMessageAreaVisible()["visibility"] == True:
+            pygame.draw.rect(board.game_display, Colour.white,(self.message_area_xpos, self.message_area_ypos, self.message_area_width, self.message_area_height))
+            line_count = 0
+            for line in message_paragraph:
+                message_text = myfont.render(line, False, Colour.black)
+                board.game_display.blit(message_text, (self.message_area_xpos + self.message_area_indent_test, self.message_area_ypos + line_count * myfont.get_height()))
+                line_count = line_count + 1
+        else:
+            pygame.draw.rect(board.game_display, Colour.dark_grey, (self.message_area_xpos, self.message_area_ypos, self.message_area_width, self.message_area_height))
 
 
 # The Right side-menu
@@ -976,6 +993,23 @@ class PlayGame():
                 #######################
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
+                    # Was a Left menu button selected
+                    for button in getButtonState():
+                        if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
+                            # Save Game
+                            if button == "save":
+                                self.saveGame(game_state)
+
+                            # Toggle info on or off
+                            if button == "info":
+                                if show_message_area["visibility"] == True:
+                                    setMessageAreaVisible("Show Info", False)
+                                else:
+                                    setMessageAreaVisible("Hide Info", True)
+
+                            # Quit Game
+                            if button == "quit":
+                                self.quitGame()
                     # Was a players node selected?
                     for icon in board.icon_list:
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
@@ -1030,8 +1064,9 @@ class PlayGame():
 
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
-                            # Allocate stage - incl first board setup
+                            # A button has been pressed
                             if board.stage <= 1:
+                                # Allocate stage - incl first board setup
                                 if button == ("confirm"):
                                     # Proceed to next player or next stage
                                     self.current_player_data["selected_node"] = ""
@@ -1050,13 +1085,13 @@ class PlayGame():
                                 self.playGame(game_state)
 
                             # Attack stage
-                            if board.stage == 2:
+                            elif board.stage == 2:
                                 if button == "attack":
                                     self.fight(game_state)
                                     self.playGame(game_state)
 
                             # Fortify
-                            if board.stage == 3:
+                            elif board.stage == 3:
                                 if board.mouse_selected_node != "":
                                     troopAllocate(board, game_state, button)
                                 if button == "confirm":
@@ -1067,14 +1102,6 @@ class PlayGame():
                                     game_state["current_player"] = self.opposition_player_data
                                     game_state["stage"] = 1
                                 self.playGame(game_state)
-
-                            # Save Game
-                            if button == "save":
-                                self.saveGame(game_state)
-
-                            # Quit Game
-                            if button == "quit":
-                                self.quitGame()
                 # also support up/down keys for add/remove troops
                 elif event.type == pygame.KEYDOWN:
                     if board.mouse_selected_node:
@@ -1096,24 +1123,25 @@ def troopAllocate(board, game_state, button):
     def moveTroops(troops):
         game_state["current_player"]["unallocated_troops"] = game_state["current_player"]["unallocated_troops"] - troops
         game_state["current_player"]["troops_at_node"][board.mouse_selected_node] = game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + troops
-    # Add up to 5 troops to the army
-    if button == "add5":
-        if game_state["current_player"]["unallocated_troops"] >= 5:
-            moveTroops(5)
-        else:
-            moveTroops(game_state["current_player"]["unallocated_troops"])  # Allocate whatever is left
-    # Add one troop to the army
-    elif button == "add1" and game_state["current_player"]["unallocated_troops"] > 0:
-        moveTroops(1)
-    # Remove one troop from the army
-    elif button == "rem1" and game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 1:
-        moveTroops(-1)
-    # Remove up to 5 troops from the army
-    elif button == "rem5":
-        if game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 5:
-            moveTroops(-5)
-        else:
-            moveTroops(0 - game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + 1)  # Bench all but one troop
+    if board.mouse_selected_node != "":
+        # Add up to 5 troops to the army
+        if button == "add5":
+            if game_state["current_player"]["unallocated_troops"] >= 5:
+                moveTroops(5)
+            else:
+                moveTroops(game_state["current_player"]["unallocated_troops"])  # Allocate whatever is left
+        # Add one troop to the army
+        elif button == "add1" and game_state["current_player"]["unallocated_troops"] > 0:
+            moveTroops(1)
+        # Remove one troop from the army
+        elif button == "rem1" and game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 1:
+            moveTroops(-1)
+        # Remove up to 5 troops from the army
+        elif button == "rem5":
+            if game_state["current_player"]["troops_at_node"][board.mouse_selected_node] > 5:
+                moveTroops(-5)
+            else:
+                moveTroops(0 - game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + 1)  # Bench all but one troop
 
 # Disperse the players unallocated troops randomly over the bases
 def initialTroopDeployment(player):
