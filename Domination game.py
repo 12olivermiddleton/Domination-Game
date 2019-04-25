@@ -29,6 +29,23 @@ class SigilBanner():
     height= 50
     width = 45
 
+
+instructions = [
+    "Welcome to Domination Game!",
+    "It is a two player game. Your armies will be randomly spread ",
+    "across the board. Use your wits and skill to conquer",
+    "neighbouring armies and dominate the board!",
+    "Each player takes turns, each turn has three phases:",
+    " * Allocate - each turn brings new troops, allocate them across",
+    "your existing armies. the more battle fronts you have, the more ",
+    "troops you will be allocated each round! So get out there and conquer!",
+    " * Attack - Select an army to attack a neighbouring base, make",
+    "sure you have more troops - or leave it to luck to win!",
+    " * Fortify - After you battle you can reinforce weak bases",
+    "from stronger armies elsewhere. Make sure you are well defended"
+    "when the other player gets their turn!",
+    "Let battle commence!"
+]
 theme_got = {
     "id": "theme_got",
     "new_game_btn_txt": "New GOT Game",
@@ -216,6 +233,23 @@ class PlayLoadGameMenu():
 
     def getButtonList(self):
         return self.button_list
+
+
+class Instructions():
+    def __init__(self):
+        self.instructionsDisplay_width = 600
+        self.instructionsDisplay_height = 700
+        self.instructionsPanel()
+
+    def instructionsPanel(self):
+        text_pos_x = 10
+        text_pos_y = 10
+        game_display = pygame.display.set_mode((self.instructionsDisplay_width, self.instructionsDisplay_height))
+        pygame.display.set_caption('Instructions')
+        myfont = pygame.font.SysFont("Comic Sans MS", 20)
+        text_surface = myfont.render(str(instructions), False, Colour.black)
+
+        game_display.blit(text_surface, (text_pos_x, text_pos_y))
 
 class Graphic():
     def __init__(self, x, y):
@@ -993,14 +1027,14 @@ class PlayGame():
                 #######################
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    # Was a Left menu button selected
+                    # Was a Left menu button selected?
                     for button in getButtonState():
                         if game_buttons[button].x + game_buttons[button].width > mouse[0] > game_buttons[button].x and game_buttons[button].y + game_buttons[button].height > mouse[1] > game_buttons[button].y:
                             # Save Game
                             if button == "save":
                                 self.saveGame(game_state)
 
-                            # Toggle info on or off
+                            # Toggle show help tips on or off
                             if button == "info":
                                 if show_message_area["visibility"] == True:
                                     setMessageAreaVisible("Show Info", False)
@@ -1143,8 +1177,9 @@ def troopAllocate(board, game_state, button):
             else:
                 moveTroops(0 - game_state["current_player"]["troops_at_node"][board.mouse_selected_node] + 1)  # Bench all but one troop
 
-# Disperse the players unallocated troops randomly over the bases
+
 def initialTroopDeployment(player):
+    # Disperse the players unallocated troops randomly over the bases
     while player["unallocated_troops"] > 0:
         random_min = 1
         random_max = len(player["playerOccupied"])
@@ -1205,8 +1240,9 @@ def newGame(board):
     play_game = PlayGame(board)
     play_game.playGame(initial_game_state)
 
-# Load a saved game from file
+
 def loadGame(board):
+    # Load a saved game from file
     with open('test_pickle.pkl', 'rb') as pickle_in:
         game_data = pickle.load(pickle_in)
         game_theme = game_data["game_theme"]
@@ -1259,6 +1295,10 @@ if __name__ == "__main__":
                             board = Board()
                             loadGame(board)
                             pass
+                        elif button_number == 3:
+                            # INFO Game
+                            info = Instructions()
+                            # play = PlayGame(info)
                     else:
                         button_min_y = button_min_y + 100
                         button_max_y = button_max_y + 100
