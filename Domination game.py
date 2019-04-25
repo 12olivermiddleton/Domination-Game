@@ -864,6 +864,10 @@ class PlayGame():
 
         board.renderLayout()
 
+    # TODO: End of game conditions
+    # Need the troop allocation at each round to work (to prevent 1 troop in every base)
+    # A player has zero troops - prevent allocation - declare win
+
 
     def saveGame(self, game_state):
         print('Save:', game_state)
@@ -881,7 +885,7 @@ class PlayGame():
             current_vertex_list = self.network_graph[current_node]
             for vertex in current_vertex_list:
                 count = count + 1
-        NoOfTroops = count
+        return count
 
     # A method to refresh the board from an initial, save or in-progress game state
     def loadBoardState(self, game_state):
@@ -1008,7 +1012,8 @@ class PlayGame():
             # self.allocationStage(game_state)
             self.renderStage(game_state)
         if board.stage == 1:  # Allocate
-            # self.allocationStage(game_state)
+            # TODO: this keeps adding troops and ach roll round the playgame look it is not tracking that it was added last go.
+            game_state["current_player"]["unallocated_troops"] = self.allocationStage(game_state)
             self.renderStage(game_state)
         elif board.stage == 2:  # Attack
             self.renderStage(game_state)
