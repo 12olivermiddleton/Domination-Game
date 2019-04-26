@@ -1011,14 +1011,15 @@ class PlayGame():
         if board.stage == 0:  # Initial
             # self.allocationStage(game_state)
             self.renderStage(game_state)
-        if board.stage == 1:  # Allocate
-            # TODO: this keeps adding troops and ach roll round the playgame look it is not tracking that it was added last go.
+        if board.stage == 1 and game_state["current_player"]["allocation_done"] == False:  # Allocate
             game_state["current_player"]["unallocated_troops"] = self.allocationStage(game_state)
+            game_state["current_player"]["allocation_done"] = True
             self.renderStage(game_state)
         elif board.stage == 2:  # Attack
             self.renderStage(game_state)
         elif board.stage == 3:  # Fortify
             self.renderStage(game_state)
+            game_state["current_player"]["allocation_done"] = False
 
         self.loadBoardState(game_state)
         while not self.crashed:
@@ -1203,6 +1204,7 @@ def newGame(board):
         "shield": game_theme["shield_p1"],
         "playerOccupied": game_theme["p1_occupied"],
         "unallocated_troops": 0,
+        "allocation_done": False,
         "troops_at_node": {},
         "selected_node": "",
         "selected_node_banner": "",
@@ -1219,6 +1221,7 @@ def newGame(board):
         "shield": game_theme["shield_p2"],
         "playerOccupied": game_theme["p2_occupied"],
         "unallocated_troops": 0,
+        "allocation_done": False,
         "troops_at_node": {},
         "selected_node": "",
         "selected_node_banner": "",
