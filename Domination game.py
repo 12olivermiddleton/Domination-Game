@@ -864,11 +864,6 @@ class PlayGame():
 
         board.renderLayout()
 
-    # TODO: End of game conditions
-    # Need the troop allocation at each round to work (to prevent 1 troop in every base)
-    # A player has zero troops - prevent allocation - declare win
-
-
     def saveGame(self, game_state):
         print('Save:', game_state)
         with open('test_pickle.pkl', 'wb') as pickle_out:
@@ -887,26 +882,44 @@ class PlayGame():
                 count = count + 1
         return count
 
+    def displayWinnerBanner(self, winner):
+        btn_win_player_banner = PaperButton()
+        indent = 10
+        btn_win_banner_width = game_theme["map_width"] - 2 * indent
+        btn_win_banner_ypos = 400
+        btn_win_banner_height = 50
+        btn_win_message_banner = PaperButton()
+        btn_win_player_banner.drawButton(board.game_display, game_theme["button_background"], btn_win_banner_width, btn_win_banner_height, self.side_menu_left.menu_width + indent, btn_win_banner_ypos , winner["display_name"], "Playerwinner")
+        btn_win_message_banner.drawButton(board.game_display, game_theme["button_background"], btn_win_banner_width, btn_win_banner_height, self.side_menu_left.menu_width + indent, btn_win_banner_ypos + btn_win_banner_height, "dominated", "Playerwinner1")
+
     # A method to refresh the board from an initial, save or in-progress game state
     def loadBoardState(self, game_state):
         board.DisplayMap(game_state["game_theme"])
-        player1 = game_state["current_player"]
-        player2 = game_state["opposition_player"]
-        if game_state["current_player"]["id"] == "p2":
-            player1 = game_state["opposition_player"]
-            player2 = game_state["current_player"]
 
-        for player in [player1, player2]:
-            for node in self.network_graph:
-                node_shape = NodeGraphic()  # instance of the Node graphics for rendering the shield, highlighting etc.
-                if node in player["playerOccupied"]:
-                    node_shape.pos_x = self.network_graph[node]["coords"][0]
-                    node_shape.pos_y = self.network_graph[node]["coords"][1]
-                    node_shape.node_network_name = node
-                    node_shape.drawNode(board, player)
-            board.side_menu_right.drawTroopAllocationArea(board, game_state)
-            board.side_menu_right.drawMessageArea()
-            pygame.display.update()
+      ## check for a win condition
+        print (len(game_state["current_player"]["playerOccupied"]), len(game_state["current_player"]["playerOccupied"]) )
+        if len( game_state["current_player"]["playerOccupied"] ) == 0:
+           self.displayWinnerBanner(game_state["opposition_player"])
+        elif len( game_state["opposition_player"]["playerOccupied"] ) == 0:
+            self.displayWinnerBanner(game_state["current_player"])
+        else:
+            player1 = game_state["current_player"]
+            player2 = game_state["opposition_player"]
+            if game_state["current_player"]["id"] == "p2":
+                player1 = game_state["opposition_player"]
+                player2 = game_state["current_player"]
+
+            for player in [player1, player2]:
+                for node in self.network_graph:
+                    node_shape = NodeGraphic()  # instance of the Node graphics for rendering the shield, highlighting etc.
+                    if node in player["playerOccupied"]:
+                        node_shape.pos_x = self.network_graph[node]["coords"][0]
+                        node_shape.pos_y = self.network_graph[node]["coords"][1]
+                        node_shape.node_network_name = node
+                        node_shape.drawNode(board, player)
+                board.side_menu_right.drawTroopAllocationArea(board, game_state)
+                board.side_menu_right.drawMessageArea()
+                pygame.display.update()
         pygame.display.update()
 
     def nearestEnemiesOfNode(self, node):
@@ -1050,6 +1063,7 @@ class PlayGame():
                             # Quit Game
                             if button == "quit":
                                 self.quitGame()
+                            self.loadBoardState(game_state)
                     # Was a players node selected?
                     for icon in board.icon_list:
                         if icon.x + icon.width > mouse[0] > icon.x and icon.y + icon.height > mouse[1] > icon.y:
