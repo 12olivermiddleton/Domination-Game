@@ -896,8 +896,7 @@ class PlayGame():
     def loadBoardState(self, game_state):
         board.DisplayMap(game_state["game_theme"])
 
-      ## check for a win condition
-        print (len(game_state["current_player"]["playerOccupied"]), len(game_state["current_player"]["playerOccupied"]) )
+        ## check for a win condition
         if len( game_state["current_player"]["playerOccupied"] ) == 0:
            self.displayWinnerBanner(game_state["opposition_player"])
         elif len( game_state["opposition_player"]["playerOccupied"] ) == 0:
